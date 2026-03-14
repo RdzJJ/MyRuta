@@ -1,0 +1,194 @@
+// MyRuta Backend - Prisma Database Schema
+// Database: PostgreSQL
+// This file defines all database models and relationships
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model (base for all user types)
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  role      Role     @default(CLIENTE)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  conductor Conductor?
+  cliente   Cliente?
+  admin     Admin?
+
+  @@map("users")
+}
+
+// Conductor (Driver)
+model Conductor {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  licenseNo    String   @unique
+  licenseExpiry DateTime
+  vehicle      String?
+  plateNo      String?  @unique
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignedRoute     Ruta?         @relation(fields: [assignedRouteId], references: [id])
+  assignedRouteId   String?
+  locations         Location[]
+  incidents         Incident[]
+
+  @@map("conductores")
+}
+
+// Cliente (Client/Passenger)
+model Cliente {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  address    String?
+  preferences String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  favoriteRoutes Ruta[]        @relation("ClienteFavorites")
+  trips          Trip[]
+
+  @@map("clientes")
+}
+
+// Admin
+model Admin {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("admins")
+}
+
+// Ruta (Route)
+model Ruta {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  code      String   @unique
+  startStop String
+  endStop   String
+  description String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  stops       Parada[]
+  conductors  Conductor[]
+  locations   Location[]
+  incidents   Incident[]
+  favorites   Cliente[]         @relation("ClienteFavorites")
+
+  @@map("rutas")
+}
+
+// Parada (Bus Stop)
+model Parada {
+  id        String   @id @default(cuid())
+  rutaId    String
+  name      String
+  latitude  Float
+  longitude Float
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  ruta Ruta @relation(fields: [rutaId], references: [id], onDelete: Cascade)
+
+  @@index([rutaId])
+  @@map("paradas")
+}
+
+// Location (GPS Tracking)
+model Location {
+  id           String   @id @default(cuid())
+  conductorId  String
+  rutaId       String
+  latitude     Float
+  longitude    Float
+  accuracy     Float?
+  speed        Float?
+  heading      Float?
+  timestamp    DateTime @default(now())
+
+  // Relations
+  conductor Conductor @relation(fields: [conductorId], references: [id], onDelete: Cascade)
+  ruta      Ruta      @relation(fields: [rutaId], references: [id], onDelete: Cascade)
+
+  @@index([conductorId])
+  @@index([rutaId])
+  @@index([timestamp])
+  @@map("locations")
+}
+
+// Trip (Journey)
+model Trip {
+  id           String   @id @default(cuid())
+  clienteId    String
+  rutaId       String?
+  startTime    DateTime
+  endTime      DateTime?
+  rating       Int?
+  feedback     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  cliente Cliente @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@index([clienteId])
+  @@map("trips")
+}
+
+// Incident (Problem/Issue Report)
+model Incident {
+  id          String   @id @default(cuid())
+  conductorId String
+  rutaId      String
+  type        String   // "breakdown", "accident", "delay", "other"
+  description String
+  severity    String   @default("medium") // low, medium, high
+  resolved    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  conductor Conductor @relation(fields: [conductorId], references: [id], onDelete: Cascade)
+  ruta      Ruta      @relation(fields: [rutaId], references: [id], onDelete: Cascade)
+
+  @@index([conductorId])
+  @@index([rutaId])
+  @@map("incidents")
+}
+
+// Enums
+enum Role {
+  ADMIN
+  CONDUCTOR
+  CLIENTE
+}
