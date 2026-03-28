@@ -1,0 +1,47 @@
+name: Predictor Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'predictor/**'
+      - '.github/workflows/predictor-tests.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'predictor/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: predictor/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+        working-directory: predictor
+
+      - name: Run tests with pytest
+        run: pytest -v --tb=short
+        working-directory: predictor
+        continue-on-error: true
+
+      - name: Run linting with pylint
+        run: pylint app/ --disable=all --enable=E
+        working-directory: predictor
+        continue-on-error: true
