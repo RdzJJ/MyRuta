@@ -46,15 +46,15 @@ class ColoredFormatter(logging.Formatter):
         if levelname in self.LEVEL_COLORS:
             record.levelname = f"{self.LEVEL_COLORS[levelname]}{levelname}{Colors.RESET}"
         
-        # Add emoji based on level
+    # Add emoji based on level
         emoji_map = {
-            'DEBUG': '🐛',
-            'INFO': 'ℹ️',
-            'WARNING': '⚠️',
-            'ERROR': '❌',
-            'CRITICAL': '🔴',
+            'DEBUG': '[DBG]',
+            'INFO': '[OK]',
+            'WARNING': '[WARN]',
+            'ERROR': '[ERR]',
+            'CRITICAL': '[CRITICAL]',
         }
-        emoji = emoji_map.get(record.levelname.split(Colors.RESET)[-1], '•')
+        emoji = emoji_map.get(record.levelname.split(Colors.RESET)[-1], '-')
         record.emoji = emoji
         
         return super().format(record)

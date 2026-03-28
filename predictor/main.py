@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
     Shutdown: Clean up resources, close connections
     """
     # Startup
-    logger.info("🚀 MyRuta Predictor Service Starting...")
+    logger.info(">>> MyRuta Predictor Service Starting...")
     logger.info(f"Environment: {settings.ENV}")
     logger.info(f"Debug Mode: {settings.DEBUG}")
     logger.info(f"Database: {settings.DATABASE_URL}")
@@ -52,22 +52,22 @@ async def lifespan(app: FastAPI):
         # TODO: Initialize database connection pool
         # TODO: Load ML model from disk
         # TODO: Warm up model with test predictions
-        logger.info("✅ Application initialized successfully")
+        logger.info("[OK] Application initialized successfully")
     except Exception as e:
-        logger.error(f"❌ Failed to initialize application: {str(e)}")
+        logger.error(f"[FAIL] Failed to initialize application: {str(e)}")
         sys.exit(1)
     
     yield
     
     # Shutdown
-    logger.info("🛑 MyRuta Predictor Service Shutting Down...")
+    logger.info(">>> MyRuta Predictor Service Shutting Down...")
     try:
         # TODO: Close database connections
         # TODO: Clean up resources
         # TODO: Save model cache if needed
-        logger.info("✅ Application shutdown completed")
+        logger.info("[OK] Application shutdown completed")
     except Exception as e:
-        logger.error(f"❌ Error during shutdown: {str(e)}")
+        logger.error(f"[FAIL] Error during shutdown: {str(e)}")
 
 
 # Create FastAPI application with custom lifespan handler
@@ -117,10 +117,11 @@ if __name__ == "__main__":
     # Run with: python -m uvicorn main:app --reload --host 0.0.0.0 --port 8001
     import uvicorn
     
+    # For direct execution without reload in development
     uvicorn.run(
         app,
         host="0.0.0.0",
         port=settings.PORT,
-        reload=settings.DEBUG,
+        reload=False,  # Set to False when running directly
         log_level=settings.LOG_LEVEL.lower(),
     )

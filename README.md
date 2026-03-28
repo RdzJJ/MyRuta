@@ -305,87 +305,203 @@ Esto levantará:
 
 ## 🏃 Ejecución Local
 
-### Backend (Puerto 3000)
+### ⚡ Inicio Rápido (Recomendado)
 
-```bash
+Ejecuta los siguientes comandos en **terminales separadas**:
+
+**Terminal 1 - Backend**:
+```powershell
 cd backend
-
-# Instalar dependencias
 npm install
-
-# Configurar variables de entorno
-cp .env.example .env
-# Editar .env según tu entorno
-
-# Ejecutar en desarrollo
-npm run dev
-
-# O con nodemon
-npm start
+node ".\src\index.js"
 ```
 
-**URL**: `http://localhost:3000`  
-**API Docs**: `http://localhost:3000/api/docs`
+**Terminal 2 - Predictor**:
+```powershell
+cd predictor
+py -m pip install -q -r requirements.txt
+py ".\main.py"
+```
 
-### Frontend Web (Puerto 5173)
-
-```bash
+**Terminal 3 - Frontend (Opcional)**:
+```powershell
 cd web
-
-# Instalar dependencias
 npm install
+npm run dev
+```
 
-# Desarrollo con HMR
+---
+
+### 1️⃣ Backend Express.js (Puerto 3000)
+
+#### Instalación
+```powershell
+cd backend
+npm install
+```
+
+#### Ejecución
+```powershell
+# Opción 1: Ejecutar directamente
+node ".\src\index.js"
+
+# Opción 2: Con npm (requiere script configurado)
+npm run dev
+```
+
+#### Verificación
+```powershell
+# Test de conectividad
+Invoke-WebRequest -Uri "http://localhost:3000" -UseBasicParsing
+```
+
+**Endpoint**: `http://localhost:3000`  
+**Logs esperados**: `[INFO] 🚀 MyRuta Backend running on port 3000`
+
+---
+
+### 2️⃣ Frontend Web (Puerto 5173)
+
+#### Instalación
+```powershell
+cd web
+npm install
+```
+
+#### Ejecución
+```powershell
+# Desarrollo con recarga en vivo (HMR)
 npm run dev
 
 # Build para producción
 npm run build
 ```
 
-**URL**: `http://localhost:5173`
+#### Verificación
+- Abre: `http://localhost:5173`
+- Debe mostrar login de MyRuta
 
-### Aplicación Móvil
+**Características**:
+- Hot Module Replacement (cambios inmediatos)
+- Vite para compilación rápida
+- Tailwind CSS integrado
 
-```bash
+---
+
+### 3️⃣ Servicio Predictor ML (Puerto 8001)
+
+#### Instalación (Primera vez)
+
+```powershell
+cd predictor
+
+# Verificar Python disponible
+py --version  # Debe ser Python 3.10+
+
+# Instalar dependencias
+py -m pip install --upgrade pip -q
+py -m pip install -q -r requirements.txt
+```
+
+#### Ejecución
+```powershell
+# Desde el directorio predictor
+py ".\main.py"
+```
+
+#### Verificación
+```powershell
+# Test health check
+Invoke-WebRequest -Uri "http://localhost:8001/api/health/" -UseBasicParsing | `
+  Select-Object -ExpandProperty Content | ConvertFrom-Json | Format-Table
+```
+
+**Respuesta esperada**:
+```
+status   database model_loaded
+------   -------- ------------
+healthy     True         True
+```
+
+#### Acceso a APIs
+- **Docs Interactivos**: http://localhost:8001/api/docs
+- **Health Check**: http://localhost:8001/api/health/
+- **Predicciones**: POST http://localhost:8001/api/predictions/predict
+
+---
+
+### 4️⃣ Aplicación Móvil Flutter (Opcional)
+
+#### Requisitos
+- Flutter 3.10+ instalado
+- Android Studio o Xcode
+
+#### Instalación
+```powershell
 cd mobile
 
 # Obtener dependencias
 flutter pub get
+```
+
+#### Ejecución
+```powershell
+# Ver dispositivos disponibles
+flutter devices
 
 # Ejecutar en emulador/dispositivo
 flutter run
 
-# Build APK
+# Build APK (Android)
 flutter build apk
 
 # Build iOS
 flutter build ios
 ```
 
-### Servicio Predictor (Puerto 8001)
+---
 
-```bash
-cd predictor
+## ✅ Verificación del Sistema Completo
 
-# Crear entorno virtual
-python -m venv venv
-source venv/bin/activate  # En Windows: venv\Scripts\activate
+Ejecuta este script para verificar que todo está corriendo:
 
-# Instalar dependencias
-pip install -r requirements.txt
+```powershell
+Write-Host "=== VERIFICACIÓN DE SERVICIOS MYRUTA ===" -ForegroundColor Cyan
 
-# Configurar variables de entorno
-cp .env.example .env
+# Test Backend
+Write-Host "`n1. Backend (Puerto 3000)..."
+try {
+    $backend = Invoke-WebRequest -Uri "http://localhost:3000" -UseBasicParsing -ErrorAction Stop
+    Write-Host "   [OK] Backend respondiendo" -ForegroundColor Green
+} catch {
+    Write-Host "   [ERROR] Backend no accesible" -ForegroundColor Red
+}
 
-# Ejecutar servidor
-python main.py
+# Test Predictor
+Write-Host "`n2. Predictor (Puerto 8001)..."
+try {
+    $predictor = Invoke-WebRequest -Uri "http://localhost:8001/api/health/" -UseBasicParsing -ErrorAction Stop
+    $health = $predictor.Content | ConvertFrom-Json
+    Write-Host "   [OK] Predictor: $($health.status)" -ForegroundColor Green
+} catch {
+    Write-Host "   [ERROR] Predictor no accesible" -ForegroundColor Red
+}
 
-# O con Uvicorn directo
-uvicorn main:app --reload --port 8001
+# Test Frontend
+Write-Host "`n3. Frontend (Puerto 5173)..."
+try {
+    $frontend = Invoke-WebRequest -Uri "http://localhost:5173" -UseBasicParsing -ErrorAction Stop
+    Write-Host "   [OK] Frontend respondiendo" -ForegroundColor Green
+} catch {
+    Write-Host "   [PENDIENTE] Frontend - ejecuta 'npm run dev' en web/" -ForegroundColor Yellow
+}
+
+Write-Host "`n=== RESUMEN ===" -ForegroundColor Cyan
+Write-Host "Todos los servicios disponibles en:" -ForegroundColor Green
+Write-Host "  Backend:   http://localhost:3000"
+Write-Host "  Frontend:  http://localhost:5173"
+Write-Host "  Predictor: http://localhost:8001/api/docs"
 ```
-
-**URL**: `http://localhost:8001`  
-**Docs**: `http://localhost:8001/api/docs`
 
 ---
 
