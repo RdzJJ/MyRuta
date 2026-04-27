@@ -1,7 +1,9 @@
-# Environment variables
+# Environment variables - CRITICAL: NEVER commit files with API keys
 .env
 .env.local
 .env.*.local
+.env.prod.local
+*.env.local
 
 # Node modules
 node_modules/

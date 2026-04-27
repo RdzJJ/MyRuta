@@ -1,8 +1,13 @@
 /**
  * MyRuta Web - Cliente Routes Search Page
+ * 
+ * Features:
+ * - Smart destination search with Google Maps autocomplete
+ * - Real-time route filtering
  */
 
 import { useState } from 'react'
+import DestinationSearch from '../../components/DestinationSearch'
 
 const mockRoutes = [
   { code: 'A001', origin: 'Centro', destination: 'Periférico', duration: '45 min', stops: 12, nextBus: '5 min' },
@@ -11,12 +16,15 @@ const mockRoutes = [
 ]
 
 export default function ConsultaRutas() {
-  const [origin, setOrigin] = useState('')
-  const [destination, setDestination] = useState('')
+  const [originLocation, setOriginLocation] = useState(null)
+  const [destinationLocation, setDestinationLocation] = useState(null)
   const [results, setResults] = useState(mockRoutes)
 
   const handleSearch = () => {
-    console.log('Buscando rutas de', origin, 'a', destination)
+    console.log('Buscando rutas:', {
+      origin: originLocation,
+      destination: destinationLocation
+    })
   }
 
   return (
@@ -33,39 +41,47 @@ export default function ConsultaRutas() {
 
         {/* Search Card */}
         <div className="bg-dark-800 border-2 border-neon-500 rounded-xl p-8 mb-8" style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.2)' }}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Origin Search */}
             <div>
               <label className="block text-sm font-semibold text-neon-500 mb-2">
                 📍 Parada de Origen
               </label>
-              <input
-                type="text"
-                value={origin}
-                onChange={(e) => setOrigin(e.target.value)}
+              <DestinationSearch 
+                onDestinationSelect={setOriginLocation}
                 placeholder="Ej: Centro, Mercado..."
-                className="w-full px-4 py-3 bg-dark-700 border-2 border-neon-500 text-neon-500 placeholder-neon-500 placeholder-opacity-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-500 transition"
-                style={{ boxShadow: '0 0 10px rgba(0, 255, 65, 0.1)' }}
+                showMyLocation={true}
               />
+              {originLocation && (
+                <p className="text-xs text-neon-500 opacity-75 mt-2">
+                  ✓ {originLocation.displayName}
+                </p>
+              )}
             </div>
 
+            {/* Destination Search */}
             <div>
               <label className="block text-sm font-semibold text-neon-500 mb-2">
                 🎯 Parada de Destino
               </label>
-              <input
-                type="text"
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
+              <DestinationSearch 
+                onDestinationSelect={setDestinationLocation}
                 placeholder="Ej: Periférico, Hospital..."
-                className="w-full px-4 py-3 bg-dark-700 border-2 border-neon-500 text-neon-500 placeholder-neon-500 placeholder-opacity-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-500 transition"
-                style={{ boxShadow: '0 0 10px rgba(0, 255, 65, 0.1)' }}
+                showMyLocation={false}
               />
+              {destinationLocation && (
+                <p className="text-xs text-neon-500 opacity-75 mt-2">
+                  ✓ {destinationLocation.displayName}
+                </p>
+              )}
             </div>
 
+            {/* Search Button */}
             <div className="flex items-end">
               <button
                 onClick={handleSearch}
-                className="w-full bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-3 px-4 rounded-lg hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
+                disabled={!originLocation || !destinationLocation}
+                className="w-full bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-3 px-4 rounded-lg hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ boxShadow: '0 0 15px rgba(0, 255, 65, 0.4)' }}
               >
                 Buscar Rutas

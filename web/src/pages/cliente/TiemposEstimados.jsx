@@ -1,6 +1,16 @@
 /**
  * MyRuta Web - Cliente Estimated Times Page
+ * 
+ * Features:
+ * - Real-time bus ETA with Google Maps integration
+ * - Destination search with autocomplete
+ * - Traffic-aware routing
  */
+
+import { useState, useContext } from 'react'
+import DestinationSearch from '../../components/DestinationSearch'
+import ETADisplay from '../../components/ETADisplay'
+import { LocationContext } from '../../contexts/LocationContext'
 
 const remainingStops = [
   { number: 1, name: 'Parada Central', time: '5 min', status: '🔴 Siguiente' },
@@ -10,6 +20,15 @@ const remainingStops = [
 ]
 
 export default function TiemposEstimados() {
+  const [selectedDestination, setSelectedDestination] = useState(null)
+  const { locations } = useContext(LocationContext) || { locations: {} }
+
+  // Get first available bus location (or use mock for demo)
+  const busLocation = Object.values(locations)[0] || {
+    latitude: 6.2442,
+    longitude: -75.5812
+  }
+
   return (
     <div className="min-h-screen bg-dark-900 text-white">
       <main className="max-w-7xl mx-auto px-4 py-8">
@@ -32,13 +51,36 @@ export default function TiemposEstimados() {
               <div className="text-center">
                 <p className="text-6xl mb-4">🗺️</p>
                 <p className="text-neon-500 text-lg">Mapa en Tiempo Real</p>
-                <p className="text-neon-500 opacity-75 text-sm mt-2">Integración con servicio de mapas</p>
+                <p className="text-neon-500 opacity-75 text-sm mt-2">Integración con servicio de mapas - Proximamente</p>
               </div>
+            </div>
+
+            {/* Destination Search */}
+            <div className="mt-6">
+              <h3 className="text-lg font-bold text-neon-500 mb-3" style={{ textShadow: '0 0 8px rgba(0, 255, 65, 0.6)' }}>
+                🎯 Selecciona tu Destino
+              </h3>
+              <DestinationSearch 
+                onDestinationSelect={setSelectedDestination}
+                placeholder="Busca un lugar en Medellín..."
+                showMyLocation={true}
+              />
             </div>
           </div>
 
           {/* Info Sidebar */}
           <div className="space-y-4">
+            {/* ETA Display */}
+            {selectedDestination && (
+              <ETADisplay 
+                busLocation={busLocation}
+                destination={selectedDestination}
+                refreshInterval={30000}
+                showDistance={true}
+                className="mb-4"
+              />
+            )}
+
             {/* Current Route */}
             <div className="bg-dark-800 border-2 border-neon-500 rounded-xl p-6" style={{ boxShadow: '0 0 15px rgba(0, 255, 65, 0.2)' }}>
               <h3 className="font-bold text-lg text-neon-500 mb-3" style={{ textShadow: '0 0 8px rgba(0, 255, 65, 0.6)' }}>
@@ -49,21 +91,6 @@ export default function TiemposEstimados() {
               <div className="mt-4 pt-4 border-t border-neon-500 border-opacity-30">
                 <p className="text-neon-500 opacity-75 text-sm">Conductor</p>
                 <p className="text-neon-500">Juan Pérez</p>
-              </div>
-            </div>
-
-            {/* Next Stop */}
-            <div className="bg-gradient-to-r from-neon-500 from-opacity-10 to-neon-600 to-opacity-5 border-2 border-neon-500 rounded-xl p-6" style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.3)' }}>
-              <h3 className="font-bold text-lg text-neon-500 mb-3" style={{ textShadow: '0 0 8px rgba(0, 255, 65, 0.6)' }}>
-                📍 Próxima Parada
-              </h3>
-              <p className="text-neon-500 font-semibold text-lg">Parada Central</p>
-              <p className="text-6xl font-bold text-neon-500 mt-4" style={{ textShadow: '0 0 15px rgba(0, 255, 65, 0.8)' }}>
-                5
-              </p>
-              <p className="text-neon-500 opacity-75">minutos</p>
-              <div className="mt-6 h-2 bg-dark-700 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-neon-500 to-neon-600 w-1/3" style={{ boxShadow: '0 0 10px rgba(0, 255, 65, 0.8)' }}></div>
               </div>
             </div>
 
