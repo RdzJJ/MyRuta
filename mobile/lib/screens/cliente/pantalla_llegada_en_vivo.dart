@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../config/theme.dart';
 import '../../config/constants.dart';
 import '../../models/ruta.dart';
@@ -16,6 +17,11 @@ class _PantallaLlegadaEnVivoState extends State<PantallaLlegadaEnVivo>
   late AnimationController _animationController;
   bool notificacionActivada = false;
   int tiempoRestante = 42; // segundos
+  
+  // Google Maps
+  late GoogleMapController _mapController;
+  Set<Marker> markers = {};
+  static const LatLng medellínLocation = LatLng(6.2442, -75.5898);
 
   @override
   void initState() {
@@ -27,6 +33,24 @@ class _PantallaLlegadaEnVivoState extends State<PantallaLlegadaEnVivo>
 
     // Actualizar tiempo restante
     Future.delayed(const Duration(seconds: 1), _actualizarTiempo);
+    _inicializarMarcadores();
+  }
+
+  void _inicializarMarcadores() {
+    markers = {
+      const Marker(
+        markerId: MarkerId('usuario'),
+        position: medellínLocation,
+        infoWindow: InfoWindow(title: 'Tú estás aquí'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      ),
+      const Marker(
+        markerId: MarkerId('bus'),
+        position: LatLng(6.2460, -75.5870),
+        infoWindow: InfoWindow(title: 'Ruta 135', snippet: 'A 500m'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      ),
+    };
   }
 
   void _actualizarTiempo() {
@@ -117,101 +141,122 @@ class _PantallaLlegadaEnVivoState extends State<PantallaLlegadaEnVivo>
   }
 
   Widget _construirCardLlegada() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-        boxShadow: AppShadows.neonGreen,
-      ),
-      child: Column(
-        children: [
-          // Contador de tiempo principal
-          Column(
+    return Column(
+      children: [
+        // Mapa con Google Maps
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: MapaGoogle(
+              ubicaciónInicial: medellínLocation,
+              markers: markers,
+              altura: 280,
+              onMapCreated: (controller) {
+                _mapController = controller;
+              },
+            ),
+          ),
+        ),
+
+        // Card principal con información de llegada
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+            boxShadow: AppShadows.neonGreen,
+          ),
+          child: Column(
             children: [
-              Text(
-                'Tiempo restante',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
-                      fontSize: 14,
-                    ),
-              ),
-              const SizedBox(height: 12),
-              Stack(
-                alignment: Alignment.center,
+              // Contador de tiempo principal
+              Column(
                 children: [
-                  // Círculo de progreso animado
-                  ScaleTransition(
-                    scale: Tween(begin: 0.95, end: 1.05).animate(
-                      CurvedAnimation(
-                        parent: _animationController,
-                        curve: Curves.easeInOut,
-                      ),
-                    ),
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.primary,
-                          width: 3,
+                  Text(
+                    'Tiempo restante',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontSize: 14,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Círculo de progreso animado
+                      ScaleTransition(
+                        scale: Tween(begin: 0.95, end: 1.05).animate(
+                          CurvedAnimation(
+                            parent: _animationController,
+                            curve: Curves.easeInOut,
+                          ),
+                        ),
+                        child: Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.primary,
+                              width: 3,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  // Número de minutos
-                  Column(
-                    children: [
-                      Text(
-                        '${(tiempoRestante ~/ 60).toString().padLeft(1, '0')}',
-                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      Text(
-                        'min',
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
+                      // Número de minutos
+                      Column(
+                        children: [
+                          Text(
+                            '${(tiempoRestante ~/ 60).toString().padLeft(1, '0')}',
+                            style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                          Text(
+                            'min',
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ],
               ),
+
+              const SizedBox(height: 24),
+              Divider(color: AppColors.border, height: 1),
+              const SizedBox(height: 24),
+
+              // Información resumida
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _construirBadgeInfo(
+                    icono: Icons.directions_bus,
+                    label: 'Bus',
+                    valor: '4022',
+                  ),
+                  _construirBadgeInfo(
+                    icono: Icons.speed,
+                    label: 'Velocidad',
+                    valor: '38 km/h',
+                  ),
+                  _construirBadgeInfo(
+                    icono: Icons.location_on_outlined,
+                    label: 'Distancia',
+                    valor: '2.3 km',
+                  ),
+                ],
+              ),
             ],
           ),
-
-          const SizedBox(height: 24),
-          Divider(color: AppColors.border, height: 1),
-          const SizedBox(height: 24),
-
-          // Información resumida
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _construirBadgeInfo(
-                icono: Icons.directions_bus,
-                label: 'Bus',
-                valor: '4022',
-              ),
-              _construirBadgeInfo(
-                icono: Icons.speed,
-                label: 'Velocidad',
-                valor: '38 km/h',
-              ),
-              _construirBadgeInfo(
-                icono: Icons.location_on_outlined,
-                label: 'Distancia',
-                valor: '2.3 km',
-              ),
-            ],
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

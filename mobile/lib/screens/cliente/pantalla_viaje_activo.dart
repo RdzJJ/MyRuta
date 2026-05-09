@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../config/theme.dart';
 import '../../config/constants.dart';
 import '../../models/ruta.dart';
@@ -15,6 +16,12 @@ class _PantallaViajeActivoState extends State<PantallaViajeActivo>
     with SingleTickerProviderStateMixin {
   late ViajeActivo viajeActivo;
   late AnimationController _animationController;
+  
+  // Google Maps
+  late GoogleMapController _mapController;
+  Set<Marker> markers = {};
+  Set<Polyline> polylines = {};
+  static const LatLng medellínLocation = LatLng(6.2442, -75.5898);
 
   @override
   void initState() {
@@ -24,6 +31,40 @@ class _PantallaViajeActivoState extends State<PantallaViajeActivo>
       vsync: this,
     )..repeat();
     _inicializarViaje();
+    _inicializarMarcadores();
+  }
+
+  void _inicializarMarcadores() {
+    markers = {
+      const Marker(
+        markerId: MarkerId('usuario'),
+        position: medellínLocation,
+        infoWindow: InfoWindow(title: 'Tu ubicación actual'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      ),
+      const Marker(
+        markerId: MarkerId('destino'),
+        position: LatLng(6.2500, -75.5850),
+        infoWindow: InfoWindow(title: 'Paradero El Tesoro'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      ),
+    };
+    
+    // Línea de ruta
+    polylines = {
+      const Polyline(
+        polylineId: PolylineId('ruta'),
+        points: [
+          LatLng(6.2442, -75.5898),
+          LatLng(6.2450, -75.5890),
+          LatLng(6.2470, -75.5870),
+          LatLng(6.2490, -75.5860),
+          LatLng(6.2500, -75.5850),
+        ],
+        color: AppColors.primary,
+        width: 4,
+      ),
+    };
   }
 
   void _inicializarViaje() {
@@ -145,117 +186,85 @@ class _PantallaViajeActivoState extends State<PantallaViajeActivo>
   }
 
   Widget _construirMapaViaje() {
-    return Container(
-      height: 220,
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-        boxShadow: AppShadows.medium,
-      ),
-      child: Stack(
-        children: [
-          // Fondo
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(12),
+        child: Stack(
+          children: [
+            MapaGoogle(
+              ubicaciónInicial: medellínLocation,
+              markers: markers,
+              polylines: polylines,
+              altura: 240,
+              onMapCreated: (controller) {
+                _mapController = controller;
+              },
             ),
-          ),
-
-          // Línea de progreso
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 4,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
+            // Badge de velocidad
+            Positioned(
+              top: 12,
+              left: 12,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.background.withOpacity(0.95),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.primary),
                 ),
-                color: AppColors.primary.withOpacity(0.2),
-              ),
-              child: FractionallySizedBox(
-                widthFactor: viajeActivo.progreso,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(12),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${viajeActivo.velocidad.toStringAsFixed(1)} km/h',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
-                    color: AppColors.primary,
-                  ),
+                    Text(
+                      'Velocidad',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
-
-          // Contenido central
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Ícono de bus
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.directions_bus,
-                    color: AppColors.primary,
-                    size: 40,
-                  ),
+            // Badge de tiempo estimado
+            Positioned(
+              top: 12,
+              right: 12,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.background.withOpacity(0.95),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.primary),
                 ),
-                const SizedBox(height: 12),
-
-                // Número de ruta
-                Text(
-                  viajeActivo.rutaNumero,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${viajeActivo.tiempoEstimado} min',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    Text(
+                      'Tiempo est.',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
-
-                // Ubicación actual
-                Text(
-                  'Ubicación actual',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                ),
-              ],
-            ),
-          ),
-
-          // Botón de expandir
-          Positioned(
-            bottom: 12,
-            right: 12,
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.primary),
-              ),
-              child: IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.fullscreen,
-                  color: AppColors.primary,
-                  size: 20,
-                ),
-                iconSize: 20,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

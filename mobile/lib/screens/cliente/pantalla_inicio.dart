@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../config/theme.dart';
 import '../../config/constants.dart';
 import '../../models/ruta.dart';
@@ -15,11 +16,43 @@ class _PantallaInicioState extends State<PantallaInicio> {
   final TextEditingController _busquedaController = TextEditingController();
   List<Ruta> rutasCercanas = [];
   bool isLoading = false;
+  
+  // Google Maps
+  late GoogleMapController _mapController;
+  Set<Marker> markers = {};
+  
+  // Ubicación simulada de Medellín, Colombia
+  static const LatLng medellínLocation = LatLng(6.2442, -75.5898);
 
   @override
   void initState() {
     super.initState();
     _cargarRutasCercanas();
+    _inicializarMarcadores();
+  }
+
+  void _inicializarMarcadores() {
+    markers = {
+      const Marker(
+        markerId: MarkerId('usuario'),
+        position: medellínLocation,
+        infoWindow: InfoWindow(title: 'Tu ubicación'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      ),
+      // Marcadores de buses cercanos
+      const Marker(
+        markerId: MarkerId('ruta_135'),
+        position: LatLng(6.2450, -75.5890),
+        infoWindow: InfoWindow(title: 'Ruta 135', snippet: 'A 2.5 km'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      ),
+      const Marker(
+        markerId: MarkerId('ruta_301'),
+        position: LatLng(6.2430, -75.5910),
+        infoWindow: InfoWindow(title: 'Ruta 301', snippet: 'A 3.2 km'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      ),
+    };
   }
 
   void _cargarRutasCercanas() {
@@ -186,79 +219,18 @@ class _PantallaInicioState extends State<PantallaInicio> {
   }
 
   Widget _construirMapaSimulado() {
-    return Container(
-      height: 200,
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Stack(
-        children: [
-          // Fondo del mapa
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-
-          // Centro
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.primary,
-                      width: 2,
-                    ),
-                  ),
-                  child: const Icon(
-                    Icons.location_on,
-                    color: AppColors.primary,
-                    size: 32,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Tu ubicación',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                ),
-              ],
-            ),
-          ),
-
-          // Botón de centrar en esquina
-          Positioned(
-            bottom: 12,
-            right: 12,
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.primary),
-              ),
-              child: IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.my_location,
-                  color: AppColors.primary,
-                  size: 20,
-                ),
-                iconSize: 20,
-              ),
-            ),
-          ),
-        ],
+        child: MapaGoogle(
+          ubicaciónInicial: medellínLocation,
+          markers: markers,
+          altura: 240,
+          onMapCreated: (controller) {
+            _mapController = controller;
+          },
+        ),
       ),
     );
   }

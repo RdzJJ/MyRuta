@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../config/theme.dart';
 import '../../config/constants.dart';
 import '../../models/ruta.dart';
@@ -16,11 +17,40 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
   List<Ruta> rutasPopulares = [];
   List<Ruta> rutasRecientes = [];
   bool isLoading = false;
+  
+  // Google Maps
+  late GoogleMapController _mapController;
+  Set<Marker> markers = {};
+  static const LatLng medellínLocation = LatLng(6.2442, -75.5898);
 
   @override
   void initState() {
     super.initState();
     _cargarRutas();
+    _inicializarMarcadores();
+  }
+
+  void _inicializarMarcadores() {
+    markers = {
+      const Marker(
+        markerId: MarkerId('ruta_135'),
+        position: LatLng(6.2450, -75.5890),
+        infoWindow: InfoWindow(title: 'Ruta 135', snippet: 'Línea 4 - 2.5 km'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      ),
+      const Marker(
+        markerId: MarkerId('ruta_301'),
+        position: LatLng(6.2430, -75.5910),
+        infoWindow: InfoWindow(title: 'Ruta 301', snippet: 'Línea 1 - 3.2 km'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      ),
+      const Marker(
+        markerId: MarkerId('express_88'),
+        position: LatLng(6.2460, -75.5870),
+        infoWindow: InfoWindow(title: 'Express 88', snippet: 'Expreso - 1.8 km'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      ),
+    };
   }
 
   void _cargarRutas() {
@@ -135,6 +165,24 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
               hint: '¿A dónde vas?',
               controller: _busquedaController,
               onChanged: (value) => setState(() {}),
+            ),
+          ),
+
+          // Mapa interactivo
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: MapaGoogle(
+                  ubicaciónInicial: medellínLocation,
+                  markers: markers,
+                  altura: 200,
+                  onMapCreated: (controller) {
+                    _mapController = controller;
+                  },
+                ),
+              ),
             ),
           ),
 
