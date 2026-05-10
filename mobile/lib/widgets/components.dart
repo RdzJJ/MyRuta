@@ -442,13 +442,13 @@ class HeaderBusqueda extends StatelessWidget {
 class IndicadorEstado extends StatelessWidget {
   final String estado;
   final bool enLivo;
-  final double? tamaño;
+  final double? tamano;
 
   const IndicadorEstado({
     Key? key,
     required this.estado,
     this.enLivo = false,
-    this.tamaño,
+    this.tamano,
   }) : super(key: key);
 
   @override
@@ -457,8 +457,8 @@ class IndicadorEstado extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: tamaño ?? 8,
-          height: tamaño ?? 8,
+          width: tamano ?? 8,
+          height: tamano ?? 8,
           decoration: BoxDecoration(
             color: enLivo ? AppColors.primary : AppColors.warning,
             shape: BoxShape.circle,
@@ -513,7 +513,7 @@ class BotonIconoEtiqueta extends StatelessWidget {
   final Color? textColor;
   final double? width;
 
-  const BotónIconoEtiqueta({
+  const BotonIconoEtiqueta({
     Key? key,
     required this.etiqueta,
     required this.icon,
@@ -720,7 +720,7 @@ class _MapaGoogleState extends State<MapaGoogle> {
               }
             ]
           ''');
-          widget.onMapCreated?.call();
+          widget.onMapCreated?.call(controller);
         },
         markers: widget.markers ?? {},
         polylines: widget.polylines ?? {},
