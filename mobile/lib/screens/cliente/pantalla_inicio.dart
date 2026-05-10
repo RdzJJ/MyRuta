@@ -22,7 +22,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
   Set<Marker> markers = {};
   
   // Ubicación simulada de Medellín, Colombia
-  static const LatLng medellínLocation = LatLng(6.2442, -75.5898);
+  static const LatLng medellinLocation = LatLng(6.2442, -75.5898);
 
   @override
   void initState() {
@@ -33,23 +33,23 @@ class _PantallaInicioState extends State<PantallaInicio> {
 
   void _inicializarMarcadores() {
     markers = {
-      const Marker(
-        markerId: MarkerId('usuario'),
-        position: medellínLocation,
-        infoWindow: InfoWindow(title: 'Tu ubicación'),
+      Marker(
+        markerId: const MarkerId('usuario'),
+        position: medellinLocation,
+        infoWindow: const InfoWindow(title: 'Tu ubicación'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       ),
       // Marcadores de buses cercanos
-      const Marker(
-        markerId: MarkerId('ruta_135'),
-        position: LatLng(6.2450, -75.5890),
-        infoWindow: InfoWindow(title: 'Ruta 135', snippet: 'A 2.5 km'),
+      Marker(
+        markerId: const MarkerId('ruta_135'),
+        position: const LatLng(6.2450, -75.5890),
+        infoWindow: const InfoWindow(title: 'Ruta 135', snippet: 'A 2.5 km'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ),
-      const Marker(
-        markerId: MarkerId('ruta_301'),
-        position: LatLng(6.2430, -75.5910),
-        infoWindow: InfoWindow(title: 'Ruta 301', snippet: 'A 3.2 km'),
+      Marker(
+        markerId: const MarkerId('ruta_301'),
+        position: const LatLng(6.2430, -75.5910),
+        infoWindow: const InfoWindow(title: 'Ruta 301', snippet: 'A 3.2 km'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ),
     };
@@ -224,7 +224,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: MapaGoogle(
-          ubicaciónInicial: medellínLocation,
+          ubicacionInicial: medellinLocation,
           markers: markers,
           altura: 240,
           onMapCreated: (controller) {

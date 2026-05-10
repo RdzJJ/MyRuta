@@ -21,7 +21,7 @@ class _PantallaLlegadaEnVivoState extends State<PantallaLlegadaEnVivo>
   // Google Maps
   late GoogleMapController _mapController;
   Set<Marker> markers = {};
-  static const LatLng medellínLocation = LatLng(6.2442, -75.5898);
+  static const LatLng medellinLocation = LatLng(6.2442, -75.5898);
 
   @override
   void initState() {
@@ -38,16 +38,16 @@ class _PantallaLlegadaEnVivoState extends State<PantallaLlegadaEnVivo>
 
   void _inicializarMarcadores() {
     markers = {
-      const Marker(
-        markerId: MarkerId('usuario'),
-        position: medellínLocation,
-        infoWindow: InfoWindow(title: 'Tú estás aquí'),
+      Marker(
+        markerId: const MarkerId('usuario'),
+        position: medellinLocation,
+        infoWindow: const InfoWindow(title: 'Tú estás aquí'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       ),
-      const Marker(
-        markerId: MarkerId('bus'),
-        position: LatLng(6.2460, -75.5870),
-        infoWindow: InfoWindow(title: 'Ruta 135', snippet: 'A 500m'),
+      Marker(
+        markerId: const MarkerId('bus'),
+        position: const LatLng(6.2460, -75.5870),
+        infoWindow: const InfoWindow(title: 'Ruta 135', snippet: 'A 500m'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ),
     };
@@ -149,10 +149,10 @@ class _PantallaLlegadaEnVivoState extends State<PantallaLlegadaEnVivo>
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: MapaGoogle(
-              ubicaciónInicial: medellínLocation,
+              ubicacionInicial: medellinLocation,
               markers: markers,
               altura: 280,
-              onMapCreated: (controller) {
+              onMapCreated: (GoogleMapController controller) {
                 _mapController = controller;
               },
             ),

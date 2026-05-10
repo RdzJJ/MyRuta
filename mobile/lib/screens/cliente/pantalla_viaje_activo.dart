@@ -21,7 +21,7 @@ class _PantallaViajeActivoState extends State<PantallaViajeActivo>
   late GoogleMapController _mapController;
   Set<Marker> markers = {};
   Set<Polyline> polylines = {};
-  static const LatLng medellínLocation = LatLng(6.2442, -75.5898);
+  static const LatLng medellinLocation = LatLng(6.2442, -75.5898);
 
   @override
   void initState() {
@@ -36,16 +36,16 @@ class _PantallaViajeActivoState extends State<PantallaViajeActivo>
 
   void _inicializarMarcadores() {
     markers = {
-      const Marker(
-        markerId: MarkerId('usuario'),
-        position: medellínLocation,
-        infoWindow: InfoWindow(title: 'Tu ubicación actual'),
+      Marker(
+        markerId: const MarkerId('usuario'),
+        position: medellinLocation,
+        infoWindow: const InfoWindow(title: 'Tu ubicación actual'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       ),
-      const Marker(
-        markerId: MarkerId('destino'),
-        position: LatLng(6.2500, -75.5850),
-        infoWindow: InfoWindow(title: 'Paradero El Tesoro'),
+      Marker(
+        markerId: const MarkerId('destino'),
+        position: const LatLng(6.2500, -75.5850),
+        infoWindow: const InfoWindow(title: 'Paradero El Tesoro'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
       ),
     };
@@ -193,11 +193,11 @@ class _PantallaViajeActivoState extends State<PantallaViajeActivo>
         child: Stack(
           children: [
             MapaGoogle(
-              ubicaciónInicial: medellínLocation,
+              ubicacionInicial: medellinLocation,
               markers: markers,
               polylines: polylines,
               altura: 240,
-              onMapCreated: (controller) {
+              onMapCreated: (GoogleMapController controller) {
                 _mapController = controller;
               },
             ),

@@ -4,7 +4,7 @@ import '../config/theme.dart';
 import '../config/constants.dart';
 
 /// Botón de acción mejorado con icono prominente
-class BotónAcción extends StatefulWidget {
+class BotonAccion extends StatefulWidget {
   final String label;
   final IconData icon;
   final VoidCallback onPressed;
@@ -12,7 +12,7 @@ class BotónAcción extends StatefulWidget {
   final Color? iconColor;
   final double size;
 
-  const BotónAcción({
+  const BotonAccion({
     Key? key,
     required this.label,
     required this.icon,
@@ -23,10 +23,10 @@ class BotónAcción extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<BotónAcción> createState() => _BotónAcciónState();
+  State<BotonAccion> createState() => _BotonAccionState();
 }
 
-class _BotónAcciónState extends State<BotónAcción>
+class _BotonAccionState extends State<BotonAccion>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
 
@@ -504,7 +504,7 @@ class LoadingSkeleton extends StatelessWidget {
 }
 
 /// Botón con icono y etiqueta - Mejorado
-class BotónIconoEtiqueta extends StatelessWidget {
+class BotonIconoEtiqueta extends StatelessWidget {
   final String etiqueta;
   final IconData icon;
   final VoidCallback onPressed;
@@ -548,17 +548,17 @@ class BotónIconoEtiqueta extends StatelessWidget {
 }
 
 /// Tarjeta de acción mejorada
-class TarjetaAcción extends StatelessWidget {
-  final String título;
-  final String descripción;
+class TarjetaAccion extends StatelessWidget {
+  final String titulo;
+  final String descripcion;
   final IconData icon;
   final VoidCallback onTap;
   final Color? accentColor;
 
-  const TarjetaAcción({
+  const TarjetaAccion({
     Key? key,
-    required this.título,
-    required this.descripción,
+    required this.titulo,
+    required this.descripcion,
     required this.icon,
     required this.onTap,
     this.accentColor,
@@ -603,7 +603,7 @@ class TarjetaAcción extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    título,
+                    titulo,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -611,7 +611,7 @@ class TarjetaAcción extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    descripción,
+                    descripcion,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppColors.textSecondary,
                         ),
@@ -635,16 +635,16 @@ class TarjetaAcción extends StatelessWidget {
 
 /// Widget de Mapa - Google Maps integrado
 class MapaGoogle extends StatefulWidget {
-  final LatLng ubicaciónInicial;
+  final LatLng ubicacionInicial;
   final Set<Marker>? markers;
   final Set<Polyline>? polylines;
-  final VoidCallback? onMapCreated;
+  final void Function(GoogleMapController)? onMapCreated;
   final double altura;
   final bool mostrarControles;
 
   const MapaGoogle({
     Key? key,
-    required this.ubicaciónInicial,
+    required this.ubicacionInicial,
     this.markers,
     this.polylines,
     this.onMapCreated,
@@ -661,18 +661,16 @@ class _MapaGoogleState extends State<MapaGoogle> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: widget.altura,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        overflow: Overflow.clip,
-      ),
-      child: GoogleMap(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        height: widget.altura,
+        child: GoogleMap(
         initialCameraPosition: CameraPosition(
-          target: widget.ubicaciónInicial,
+          target: widget.ubicacionInicial,
           zoom: 15,
         ),
-        onMapCreated: (controller) {
+        onMapCreated: (GoogleMapController controller) {
           _mapController = controller;
           // Aplicar estilo oscuro al mapa
           _mapController.setMapStyle('''
@@ -731,17 +729,18 @@ class _MapaGoogleState extends State<MapaGoogle> {
         scrollGesturesEnabled: true,
         rotateGesturesEnabled: true,
       ),
+      ),
     );
   }
 }
 
 /// Badge de estado en vivo
 class BadgeEnVivo extends StatefulWidget {
-  final Duration? duracionAnimación;
+  final Duration? duracionAnimacion;
 
   const BadgeEnVivo({
     Key? key,
-    this.duracionAnimación,
+    this.duracionAnimacion,
   }) : super(key: key);
 
   @override
@@ -756,7 +755,7 @@ class _BadgeEnVivoState extends State<BadgeEnVivo>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: widget.duracionAnimación ?? const Duration(seconds: 1),
+      duration: widget.duracionAnimacion ?? const Duration(seconds: 1),
       vsync: this,
     )..repeat(reverse: true);
   }

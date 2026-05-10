@@ -21,7 +21,7 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
   // Google Maps
   late GoogleMapController _mapController;
   Set<Marker> markers = {};
-  static const LatLng medellínLocation = LatLng(6.2442, -75.5898);
+  static const LatLng medellinLocation = LatLng(6.2442, -75.5898);
 
   @override
   void initState() {
@@ -32,22 +32,22 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
 
   void _inicializarMarcadores() {
     markers = {
-      const Marker(
-        markerId: MarkerId('ruta_135'),
-        position: LatLng(6.2450, -75.5890),
-        infoWindow: InfoWindow(title: 'Ruta 135', snippet: 'Línea 4 - 2.5 km'),
+      Marker(
+        markerId: const MarkerId('ruta_135'),
+        position: const LatLng(6.2450, -75.5890),
+        infoWindow: const InfoWindow(title: 'Ruta 135', snippet: 'Línea 4 - 2.5 km'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ),
-      const Marker(
-        markerId: MarkerId('ruta_301'),
-        position: LatLng(6.2430, -75.5910),
-        infoWindow: InfoWindow(title: 'Ruta 301', snippet: 'Línea 1 - 3.2 km'),
+      Marker(
+        markerId: const MarkerId('ruta_301'),
+        position: const LatLng(6.2430, -75.5910),
+        infoWindow: const InfoWindow(title: 'Ruta 301', snippet: 'Línea 1 - 3.2 km'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ),
-      const Marker(
-        markerId: MarkerId('express_88'),
-        position: LatLng(6.2460, -75.5870),
-        infoWindow: InfoWindow(title: 'Express 88', snippet: 'Expreso - 1.8 km'),
+      Marker(
+        markerId: const MarkerId('express_88'),
+        position: const LatLng(6.2460, -75.5870),
+        infoWindow: const InfoWindow(title: 'Express 88', snippet: 'Expreso - 1.8 km'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ),
     };
@@ -175,10 +175,10 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: MapaGoogle(
-                  ubicaciónInicial: medellínLocation,
+                  ubicacionInicial: medellinLocation,
                   markers: markers,
                   altura: 200,
-                  onMapCreated: (controller) {
+                  onMapCreated: (GoogleMapController controller) {
                     _mapController = controller;
                   },
                 ),
