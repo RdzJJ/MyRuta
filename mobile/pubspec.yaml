@@ -21,7 +21,6 @@ dependencies:
 
   # Maps
   google_maps_flutter: ^2.4.0
-  google_maps_flutter_web: ^0.4.0
 
   # Location
   geolocator: ^9.0.0
