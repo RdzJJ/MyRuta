@@ -4,7 +4,6 @@
 .env.*.local
 .env.prod.local
 *.env.local
-.env.example
 
 # Node modules
 node_modules/
