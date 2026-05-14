@@ -96,7 +96,7 @@ export default function Navbar() {
 
       {/* Breadcrumb / Info Bar */}
       <div className="bg-dark-800 px-4 py-2 text-sm border-t border-neon-500 border-opacity-30">
-        {isAuthenticated ? (
+        {isAuthenticated && user ? (
           <span className="text-neon-500" style={{ textShadow: '0 0 5px rgba(0, 255, 65, 0.5)' }}>
             ✓ Sesión activa como <strong>{user.role}</strong>
           </span>
