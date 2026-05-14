@@ -78,7 +78,16 @@ export async function getAutocompleteSuggestions(input) {
     const service = new google.maps.places.AutocompleteService()
     const response = await service.getPlacePredictions(request)
 
-    return response.predictions || []
+    // Map predictions to ensure consistent structure with text, description, and place_id
+    const predictions = (response.predictions || []).map(pred => ({
+      place_id: pred.place_id,
+      description: pred.description, // Full description text
+      main_text: pred.main_text, // Primary text
+      secondary_text: pred.secondary_text, // Secondary text (address details)
+      matched_substrings: pred.matched_substrings
+    }))
+
+    return predictions
   } catch (error) {
     console.error('Error fetching autocomplete suggestions:', error)
     throw new Error('Failed to fetch suggestions: ' + error.message)

@@ -10,6 +10,7 @@
 import { useState, useContext } from 'react'
 import DestinationSearch from '../../components/DestinationSearch'
 import ETADisplay from '../../components/ETADisplay'
+import MedellinMap from '../../components/Maps/MedellinMap'
 import { LocationContext } from '../../contexts/LocationContext'
 
 const remainingStops = [
@@ -44,16 +45,11 @@ export default function TiemposEstimados() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Map Section */}
           <div className="lg:col-span-2">
-            <div
-              className="bg-dark-800 border-2 border-neon-500 rounded-xl p-8 h-96 flex items-center justify-center"
-              style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.2)' }}
-            >
-              <div className="text-center">
-                <p className="text-6xl mb-4">🗺️</p>
-                <p className="text-neon-500 text-lg">Mapa en Tiempo Real</p>
-                <p className="text-neon-500 opacity-75 text-sm mt-2">Integración con servicio de mapas - Proximamente</p>
-              </div>
-            </div>
+            {/* Medellín Map */}
+            <MedellinMap 
+              selectedLocation={selectedDestination}
+              className="h-96"
+            />
 
             {/* Destination Search */}
             <div className="mt-6">

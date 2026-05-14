@@ -139,19 +139,25 @@ export default function DestinationSearch({
             {/* Suggestions Dropdown */}
             {showSuggestions && suggestions.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-2 bg-dark-700 border-2 border-neon-500 rounded-lg overflow-hidden z-50" style={{ boxShadow: '0 0 15px rgba(0, 255, 65, 0.2)' }}>
-                {suggestions.map((suggestion, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleSuggestionClick(suggestion)}
-                    className="w-full px-4 py-3 text-left text-white hover:bg-dark-600 transition border-b border-dark-600 last:border-b-0 flex items-start gap-3"
-                  >
-                    <span className="text-neon-500 text-lg flex-shrink-0">📍</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-white truncate font-medium">{suggestion.main_text}</div>
-                      <div className="text-gray-400 text-sm truncate">{suggestion.secondary_text}</div>
-                    </div>
-                  </button>
-                ))}
+                {suggestions.map((suggestion, idx) => {
+                  // Handle both structured (main_text/secondary_text) and simple (description) formats
+                  const primaryText = suggestion.main_text || suggestion.description
+                  const secondaryText = suggestion.secondary_text || ''
+                  
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => handleSuggestionClick(suggestion)}
+                      className="w-full px-4 py-3 text-left text-white hover:bg-dark-600 transition border-b border-dark-600 last:border-b-0 flex items-start gap-3"
+                    >
+                      <span className="text-neon-500 text-lg flex-shrink-0">📍</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-white truncate font-medium">{primaryText}</div>
+                        {secondaryText && <div className="text-gray-400 text-sm truncate">{secondaryText}</div>}
+                      </div>
+                    </button>
+                  )
+                })}
               </div>
             )}
 

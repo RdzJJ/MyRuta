@@ -4,10 +4,12 @@
  * Features:
  * - Smart destination search with Google Maps autocomplete
  * - Real-time route filtering
+ * - Interactive map centered on Medellín
  */
 
 import { useState } from 'react'
 import DestinationSearch from '../../components/DestinationSearch'
+import MedellinMap from '../../components/Maps/MedellinMap'
 
 const mockRoutes = [
   { code: 'A001', origin: 'Centro', destination: 'Periférico', duration: '45 min', stops: 12, nextBus: '5 min' },
@@ -37,6 +39,14 @@ export default function ConsultaRutas() {
           </h1>
           <p className="text-neon-500 opacity-75">Encuentra la ruta perfecta para tu destino</p>
           <div className="h-1 w-24 bg-gradient-to-r from-neon-500 to-transparent mt-4"></div>
+        </div>
+
+        {/* Map Display */}
+        <div className="mb-8">
+          <MedellinMap 
+            selectedLocation={destinationLocation}
+            className="rounded-xl"
+          />
         </div>
 
         {/* Search Card */}
