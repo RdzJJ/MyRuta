@@ -15,7 +15,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
       appBar: AppBar(
         title: const Text('Mi Perfil'),
         centerTitle: true,
-        backgroundColor: AppColors.darkCard,
+        backgroundColor: AppColors.background,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -27,7 +27,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.darkCard,
+                color: AppColors.surface,
                 border: Border.all(color: AppColors.primary, width: 3),
               ),
               child: const Icon(
@@ -40,12 +40,16 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
             // Nombre
             Text(
               'Usuario',
-              style: AppTextStyles.heading1.copyWith(color: Colors.white),
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
             ),
             const SizedBox(height: 8),
             Text(
               'usuario@example.com',
-              style: AppTextStyles.body2.copyWith(color: Colors.grey),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
             ),
             const SizedBox(height: 30),
             // Opciones de perfil
@@ -85,7 +89,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppColors.darkCard,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
@@ -96,11 +100,11 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
         title: Text(
           title,
           style: TextStyle(
-            color: isDangerous ? Colors.red : Colors.white,
+            color: isDangerous ? Colors.red : AppColors.textPrimary,
             fontWeight: FontWeight.w500,
           ),
         ),
-        trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+        trailing: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
         onTap: onTap,
       ),
     );
