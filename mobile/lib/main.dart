@@ -5,6 +5,7 @@ import 'screens/cliente/pantalla_inicio.dart';
 import 'screens/cliente/pantalla_explorar_rutas.dart';
 import 'screens/cliente/pantalla_viaje_activo.dart';
 import 'screens/cliente/pantalla_llegada_en_vivo.dart';
+import 'screens/cliente/pantalla_perfil.dart';
 
 void main() {
   runApp(const MyRutaApp());
@@ -36,11 +37,12 @@ class _PantallaNavegacionState extends State<PantallaNavegacion> {
   int _indiceSeleccionado = 0;
   bool _viajeActivo = false;
 
-  late final List<Widget> _pantallas = [
+  List<Widget> get _pantallas => [
     const PantallaInicio(),
     const PantallaExplorarRutas(),
     if (_viajeActivo) const PantallaViajeActivo(),
     const PantallaLlegadaEnVivo(),
+    const PantallaPerfil(),
   ];
 
   @override
