@@ -1,0 +1,154 @@
+/**
+ * MyRuta Web - Global Styles
+ * Futuristic Theme: Dark backgrounds with neon green accents
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #0a0a0a;
+  color: #00ff41;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: #0a0a0a;
+}
+
+:focus-visible {
+  outline: 2px solid #00ff41;
+  outline-offset: 2px;
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00ff41;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00dd00;
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.8);
+}
+
+/* Input styling */
+input, textarea, select {
+  color: #00ff41;
+  background-color: #1a1a1a;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #00ff41;
+  opacity: 0.5;
+}
+
+/* Selection styling */
+::selection {
+  background-color: #00ff41;
+  color: #0a0a0a;
+}
+
+::-moz-selection {
+  background-color: #00ff41;
+  color: #0a0a0a;
+}
+
+/* Links */
+a {
+  color: #00ff41;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+a:hover {
+  color: #00dd00;
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
+}
+
+/* Buttons */
+button {
+  font-family: 'Inter', system-ui, sans-serif;
+  transition: all 0.3s ease;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Cards and containers */
+.card, .container {
+  background-color: #1a1a1a;
+  border-color: #00ff41;
+}
+
+/* Text shadows for neon effect */
+.neon-text {
+  color: #00ff41;
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.8),
+               0 0 20px rgba(0, 255, 65, 0.5);
+}
+
+.neon-glow {
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.5),
+              inset 0 0 15px rgba(0, 255, 65, 0.1);
+}
+
+/* Animations */
+@keyframes glow {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(0, 255, 65, 1);
+  }
+}
+
+@keyframes pulse-neon {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(0, 255, 65, 0.8);
+  }
+}
+
+@keyframes scan-lines {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-pulse-neon {
+  animation: pulse-neon 2s ease-in-out infinite;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
