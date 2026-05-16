@@ -57,11 +57,6 @@ export async function getAutocompleteSuggestions(input) {
   }
 
   try {
-    // Initialize Places Service if not already done
-    if (!placesService) {
-      await initializePlacesService()
-    }
-
     const request = {
       input,
       locationBias: {
@@ -76,7 +71,12 @@ export async function getAutocompleteSuggestions(input) {
     request.sessionToken = sessionToken
 
     const service = new google.maps.places.AutocompleteService()
-    const response = await service.getPlacePredictions(request)
+    const response = await new Promise((res, rej) =>
+      service.getPlacePredictions(request, (predictions, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK) res({ predictions })
+        else rej(new Error(`Autocomplete error: ${status}`))
+      })
+    )
 
     // Map predictions to ensure consistent structure with text, description, and place_id
     const predictions = (response.predictions || []).map(pred => ({
@@ -105,37 +105,31 @@ export async function getPlaceDetails(placeId) {
   }
 
   try {
-    if (!placesService) {
-      await initializePlacesService()
-    }
+    // Nueva API Place (reemplaza PlacesService deprecada)
+    const { Place } = await google.maps.importLibrary('places')
 
-    const request = {
-      placeId,
-      fields: ['location', 'displayName', 'formattedAddress', 'photos', 'types'],
-      language: 'es'
-    }
-
-    const service = new google.maps.places.PlacesService(
-      document.createElement('div') // Dummy div for service initialization
-    )
-
-    return new Promise((resolve, reject) => {
-      service.getDetails(request, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-          resolve({
-            placeId,
-            displayName: place.name || place.formatted_address || '',
-            address: place.formatted_address || '',
-            latitude: place.geometry?.location?.lat() || null,
-            longitude: place.geometry?.location?.lng() || null,
-            photos: place.photos?.map(photo => photo.getUrl({ maxWidth: 400, maxHeight: 400 })) || [],
-            types: place.types || []
-          })
-        } else {
-          reject(new Error(`Failed to fetch place details: ${status}`))
-        }
-      })
+    const place = new Place({
+      id: placeId,
+      requestedLanguage: 'es'
     })
+
+    await place.fetchFields({
+      fields: ['displayName', 'formattedAddress', 'location', 'photos', 'types']
+    })
+
+    if (!place.location) {
+      throw new Error('No se encontró ubicación para este lugar')
+    }
+
+    return {
+      placeId,
+      displayName: place.displayName || place.formattedAddress || '',
+      address: place.formattedAddress || '',
+      latitude: place.location.lat(),
+      longitude: place.location.lng(),
+      photos: place.photos?.map(photo => photo.getURI({ maxWidth: 400, maxHeight: 400 })) || [],
+      types: place.types || []
+    }
   } catch (error) {
     console.error('Error fetching place details:', error)
     throw new Error('Failed to fetch place details: ' + error.message)

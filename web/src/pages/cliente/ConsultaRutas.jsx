@@ -45,6 +45,7 @@ export default function ConsultaRutas() {
         <div className="mb-8">
           <MedellinMap 
             selectedLocation={destinationLocation}
+            originLocation={originLocation}
             className="rounded-xl"
           />
         </div>
