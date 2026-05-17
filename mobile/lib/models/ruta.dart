@@ -1,53 +1,192 @@
-/// Modelo de Ruta
+/// Modelo de Ruta (Compatible con Backend)
 class Ruta {
   final String id;
-  final String numero; // Ej: "Ruta 135"
-  final String nombre;
-  final String linea; // Ej: "Línea 4"
-  final String estado; // "activa", "inactiva"
-  final double distancia; // en km
-  final int tiempoEstimado; // en minutos
-  final String ubicacionActual;
-  final String proximaParada;
-  final bool enVivo;
-  final String imageUrl;
-  final DateTime ultimaActualizacion;
+  final String name;
+  final String code;
+  final String startStop;
+  final String endStop;
+  final String? description;
+  final bool active;
+  final List<Parada> stops;
+  final List<Conductor> conductors;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   Ruta({
     required this.id,
-    required this.numero,
-    required this.nombre,
-    required this.linea,
-    required this.estado,
-    required this.distancia,
-    required this.tiempoEstimado,
-    required this.ubicacionActual,
-    required this.proximaParada,
-    required this.enVivo,
-    required this.imageUrl,
-    required this.ultimaActualizacion,
+    required this.name,
+    required this.code,
+    required this.startStop,
+    required this.endStop,
+    this.description,
+    required this.active,
+    this.stops = const [],
+    this.conductors = const [],
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   factory Ruta.fromJson(Map<String, dynamic> json) {
     return Ruta(
       id: json['id'] ?? '',
-      numero: json['numero'] ?? '',
-      nombre: json['nombre'] ?? '',
-      linea: json['linea'] ?? '',
-      estado: json['estado'] ?? 'inactiva',
-      distancia: (json['distancia'] as num?)?.toDouble() ?? 0.0,
-      tiempoEstimado: json['tiempoEstimado'] ?? 0,
-      ubicacionActual: json['ubicacionActual'] ?? '',
-      proximaParada: json['proximaParada'] ?? '',
-      enVivo: json['enVivo'] ?? false,
-      imageUrl: json['imageUrl'] ?? '',
-      ultimaActualizacion: DateTime.tryParse(json['ultimaActualizacion'] ?? '') ?? DateTime.now(),
+      name: json['name'] ?? '',
+      code: json['code'] ?? '',
+      startStop: json['startStop'] ?? '',
+      endStop: json['endStop'] ?? '',
+      description: json['description'],
+      active: json['active'] ?? true,
+      stops: (json['stops'] as List?)
+          ?.map((p) => Parada.fromJson(p))
+          .toList() ?? [],
+      conductors: (json['conductors'] as List?)
+          ?.map((c) => Conductor.fromJson(c))
+          .toList() ?? [],
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
     );
   }
 
   Map<String, dynamic> toJson() => {
     'id': id,
-    'numero': numero,
+    'name': name,
+    'code': code,
+    'startStop': startStop,
+    'endStop': endStop,
+    'description': description,
+    'active': active,
+    'stops': stops.map((p) => p.toJson()).toList(),
+    'conductors': conductors.map((c) => c.toJson()).toList(),
+    'createdAt': createdAt.toIso8601String(),
+    'updatedAt': updatedAt.toIso8601String(),
+  };
+}
+
+/// Modelo de Parada
+class Parada {
+  final String id;
+  final String rutaId;
+  final String name;
+  final double latitude;
+  final double longitude;
+  final int order;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  Parada({
+    required this.id,
+    required this.rutaId,
+    required this.name,
+    required this.latitude,
+    required this.longitude,
+    required this.order,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory Parada.fromJson(Map<String, dynamic> json) {
+    return Parada(
+      id: json['id'] ?? '',
+      rutaId: json['rutaId'] ?? '',
+      name: json['name'] ?? '',
+      latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
+      order: json['order'] ?? 0,
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'rutaId': rutaId,
+    'name': name,
+    'latitude': latitude,
+    'longitude': longitude,
+    'order': order,
+    'createdAt': createdAt.toIso8601String(),
+    'updatedAt': updatedAt.toIso8601String(),
+  };
+}
+
+/// Modelo de Conductor
+class Conductor {
+  final String id;
+  final String userId;
+  final String? licenseNo;
+  final String? vehicle;
+  final String? plateNo;
+  final bool active;
+  final UsuarioInfo? user;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  Conductor({
+    required this.id,
+    required this.userId,
+    this.licenseNo,
+    this.vehicle,
+    this.plateNo,
+    required this.active,
+    this.user,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory Conductor.fromJson(Map<String, dynamic> json) {
+    return Conductor(
+      id: json['id'] ?? '',
+      userId: json['userId'] ?? '',
+      licenseNo: json['licenseNo'],
+      vehicle: json['vehicle'],
+      plateNo: json['plateNo'],
+      active: json['active'] ?? true,
+      user: json['user'] != null ? UsuarioInfo.fromJson(json['user']) : null,
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'userId': userId,
+    'licenseNo': licenseNo,
+    'vehicle': vehicle,
+    'plateNo': plateNo,
+    'active': active,
+    'user': user?.toJson(),
+    'createdAt': createdAt.toIso8601String(),
+    'updatedAt': updatedAt.toIso8601String(),
+  };
+}
+
+/// Modelo de Usuario (Info básica)
+class UsuarioInfo {
+  final String firstName;
+  final String lastName;
+  final String? phone;
+
+  UsuarioInfo({
+    required this.firstName,
+    required this.lastName,
+    this.phone,
+  });
+
+  factory UsuarioInfo.fromJson(Map<String, dynamic> json) {
+    return UsuarioInfo(
+      firstName: json['firstName'] ?? '',
+      lastName: json['lastName'] ?? '',
+      phone: json['phone'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'firstName': firstName,
+    'lastName': lastName,
+    'phone': phone,
+  };
+
+  String get nombreCompleto => '$firstName $lastName';
+}
     'nombre': nombre,
     'linea': linea,
     'estado': estado,
