@@ -8,6 +8,7 @@ import 'screens/cliente/pantalla_llegada_en_vivo.dart';
 import 'screens/cliente/pantalla_perfil.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyRutaApp());
 }
 

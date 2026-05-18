@@ -41,6 +41,10 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
   void dispose() {
     _busquedaController.removeListener(_onBusquedaChanged);
     _busquedaController.dispose();
+    // Dispose map controller if initialized
+    try {
+      _mapController.dispose();
+    } catch (_) {}
     super.dispose();
   }
 
@@ -229,7 +233,7 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
   }
 
   void _ajustarCamara(Set<Marker> marcadores) {
-    if (marcadores.isEmpty || _mapController == null) return;
+    if (marcadores.isEmpty) return;
 
     double minLat = marcadores.first.position.latitude;
     double maxLat = marcadores.first.position.latitude;
@@ -248,7 +252,13 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
       northeast: LatLng(maxLat, maxLng),
     );
 
-    _mapController.animateCamera(CameraUpdateOptions(bounds: bounds));
+    try {
+      _mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+    } catch (e) {
+      // Fallback: center camera if bounds fail
+      final center = LatLng((minLat + maxLat) / 2, (minLng + maxLng) / 2);
+      _mapController.animateCamera(CameraUpdate.newLatLng(center));
+    }
   }
 
   @override
@@ -400,13 +410,13 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
             SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 1.0,
+                childAspectRatio: 1.2,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
               ),
               delegate: SliverChildBuilderDelegate(
                 (context, index) => Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
@@ -420,7 +430,7 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
                     ],
                   ),
                 ),
-                childCount: 2,
+                childCount: rutasPopulares.isEmpty ? 2 : rutasPopulares.length,
               ),
             )
           else
@@ -521,10 +531,8 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
           const SliverToBoxAdapter(
             child: SizedBox(height: 24),
           ),
-        ],
-      ),
-    );
-  }
+        ];
+    }
 
   Widget _construirCardRutaPopular(Ruta ruta) {
     return GestureDetector(
@@ -793,7 +801,7 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
             ),
             child: Center(
               child: Text(
-                ruta.numero.split(' ').last,
+                ruta.code.isNotEmpty ? ruta.code : ruta.numero,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.bold,
@@ -809,14 +817,14 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  ruta.numero,
+                  ruta.code.isNotEmpty ? ruta.code : ruta.numero,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  ruta.nombre,
+                  ruta.name.isNotEmpty ? ruta.name : ruta.nombre,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: AppColors.textSecondary,
                       ),
@@ -838,9 +846,4 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
     );
   }
 
-  @override
-  void dispose() {
-    _busquedaController.dispose();
-    super.dispose();
-  }
 }

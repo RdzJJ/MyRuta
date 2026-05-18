@@ -3,8 +3,19 @@ class Ruta {
   final String id;
   final String name;
   final String code;
+  final String numero;
+  final String nombre;
+  final String linea;
+  final String estado;
   final String startStop;
   final String endStop;
+  final double distancia;
+  final int tiempoEstimado;
+  final String ubicacionActual;
+  final String proximaParada;
+  final bool enVivo;
+  final String imageUrl;
+  final DateTime? ultimaActualizacion;
   final String? description;
   final bool active;
   final List<Parada> stops;
@@ -13,26 +24,52 @@ class Ruta {
   final DateTime updatedAt;
 
   Ruta({
-    required this.id,
-    required this.name,
-    required this.code,
-    required this.startStop,
-    required this.endStop,
+    this.id = '',
+    this.name = '',
+    this.code = '',
+    this.numero = '',
+    this.nombre = '',
+    this.linea = '',
+    this.estado = '',
+    this.startStop = '',
+    this.endStop = '',
+    this.distancia = 0.0,
+    this.tiempoEstimado = 0,
+    this.ubicacionActual = '',
+    this.proximaParada = '',
+    this.enVivo = false,
+    this.imageUrl = '',
+    DateTime? ultimaActualizacion,
     this.description,
-    required this.active,
+    this.active = true,
     this.stops = const [],
     this.conductors = const [],
-    required this.createdAt,
-    required this.updatedAt,
-  });
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  })  : ultimaActualizacion = ultimaActualizacion,
+       createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   factory Ruta.fromJson(Map<String, dynamic> json) {
     return Ruta(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       code: json['code'] ?? '',
+      numero: json['numero'] ?? json['code'] ?? '',
+      nombre: json['nombre'] ?? json['name'] ?? '',
+      linea: json['linea'] ?? '',
+      estado: json['estado'] ?? '',
       startStop: json['startStop'] ?? '',
       endStop: json['endStop'] ?? '',
+      distancia: (json['distancia'] as num?)?.toDouble() ?? 0.0,
+      tiempoEstimado: json['tiempoEstimado'] ?? 0,
+      ubicacionActual: json['ubicacionActual'] ?? '',
+      proximaParada: json['proximaParada'] ?? '',
+      enVivo: json['enVivo'] ?? false,
+      imageUrl: json['imageUrl'] ?? '',
+      ultimaActualizacion: json['ultimaActualizacion'] != null
+          ? DateTime.tryParse(json['ultimaActualizacion'])
+          : null,
       description: json['description'],
       active: json['active'] ?? true,
       stops: (json['stops'] as List?)
@@ -45,20 +82,31 @@ class Ruta {
       updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
     );
   }
-
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'code': code,
-    'startStop': startStop,
-    'endStop': endStop,
-    'description': description,
-    'active': active,
-    'stops': stops.map((p) => p.toJson()).toList(),
-    'conductors': conductors.map((c) => c.toJson()).toList(),
-    'createdAt': createdAt.toIso8601String(),
-    'updatedAt': updatedAt.toIso8601String(),
-  };
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'code': code,
+      'numero': numero,
+      'nombre': nombre,
+      'linea': linea,
+      'startStop': startStop,
+      'endStop': endStop,
+      'distancia': distancia,
+      'tiempoEstimado': tiempoEstimado,
+      'ubicacionActual': ubicacionActual,
+      'proximaParada': proximaParada,
+      'enVivo': enVivo,
+      'imageUrl': imageUrl,
+      'ultimaActualizacion': ultimaActualizacion?.toIso8601String(),
+      'description': description,
+      'active': active,
+      'stops': stops.map((p) => p.toJson()).toList(),
+      'conductors': conductors.map((c) => c.toJson()).toList(),
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
 }
 
 /// Modelo de Parada
@@ -187,18 +235,7 @@ class UsuarioInfo {
 
   String get nombreCompleto => '$firstName $lastName';
 }
-    'nombre': nombre,
-    'linea': linea,
-    'estado': estado,
-    'distancia': distancia,
-    'tiempoEstimado': tiempoEstimado,
-    'ubicacionActual': ubicacionActual,
-    'proximaParada': proximaParada,
-    'enVivo': enVivo,
-    'imageUrl': imageUrl,
-    'ultimaActualizacion': ultimaActualizacion.toIso8601String(),
-  };
-}
+
 
 /// Modelo de Viaje Activo
 class ViajeActivo {
