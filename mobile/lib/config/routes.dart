@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../screens/cliente/pantalla_perfil.dart';
-import '../screens/cliente/pantalla_inicio.dart';
+
 import '../screens/cliente/pantalla_explorar_rutas.dart';
-import '../screens/cliente/pantalla_viaje_activo.dart';
+import '../screens/cliente/pantalla_inicio.dart';
 import '../screens/cliente/pantalla_llegada_en_vivo.dart';
+import '../screens/cliente/pantalla_perfil.dart';
+import '../screens/cliente/pantalla_viaje_activo.dart';
 import '../screens/conductor/pantalla_login_conductor.dart';
 
 class AppRouter {

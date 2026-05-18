@@ -1,27 +1,5 @@
 /// Modelo de Ruta (Compatible con Backend)
 class Ruta {
-  final String id;
-  final String name;
-  final String code;
-  final String numero;
-  final String nombre;
-  final String linea;
-  final String estado;
-  final String startStop;
-  final String endStop;
-  final double distancia;
-  final int tiempoEstimado;
-  final String ubicacionActual;
-  final String proximaParada;
-  final bool enVivo;
-  final String imageUrl;
-  final DateTime? ultimaActualizacion;
-  final String? description;
-  final bool active;
-  final List<Parada> stops;
-  final List<Conductor> conductors;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   Ruta({
     this.id = '',
@@ -82,8 +60,29 @@ class Ruta {
       updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
     );
   }
-  Map<String, dynamic> toJson() {
-    return {
+  final String id;
+  final String name;
+  final String code;
+  final String numero;
+  final String nombre;
+  final String linea;
+  final String estado;
+  final String startStop;
+  final String endStop;
+  final double distancia;
+  final int tiempoEstimado;
+  final String ubicacionActual;
+  final String proximaParada;
+  final bool enVivo;
+  final String imageUrl;
+  final DateTime? ultimaActualizacion;
+  final String? description;
+  final bool active;
+  final List<Parada> stops;
+  final List<Conductor> conductors;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  Map<String, dynamic> toJson() => {
       'id': id,
       'name': name,
       'code': code,
@@ -106,19 +105,10 @@ class Ruta {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
-  }
 }
 
 /// Modelo de Parada
 class Parada {
-  final String id;
-  final String rutaId;
-  final String name;
-  final double latitude;
-  final double longitude;
-  final int order;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   Parada({
     required this.id,
@@ -143,6 +133,14 @@ class Parada {
       updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
     );
   }
+  final String id;
+  final String rutaId;
+  final String name;
+  final double latitude;
+  final double longitude;
+  final int order;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -158,15 +156,6 @@ class Parada {
 
 /// Modelo de Conductor
 class Conductor {
-  final String id;
-  final String userId;
-  final String? licenseNo;
-  final String? vehicle;
-  final String? plateNo;
-  final bool active;
-  final UsuarioInfo? user;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   Conductor({
     required this.id,
@@ -193,6 +182,15 @@ class Conductor {
       updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
     );
   }
+  final String id;
+  final String userId;
+  final String? licenseNo;
+  final String? vehicle;
+  final String? plateNo;
+  final bool active;
+  final UsuarioInfo? user;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -209,9 +207,6 @@ class Conductor {
 
 /// Modelo de Usuario (Info básica)
 class UsuarioInfo {
-  final String firstName;
-  final String lastName;
-  final String? phone;
 
   UsuarioInfo({
     required this.firstName,
@@ -226,6 +221,9 @@ class UsuarioInfo {
       phone: json['phone'],
     );
   }
+  final String firstName;
+  final String lastName;
+  final String? phone;
 
   Map<String, dynamic> toJson() => {
     'firstName': firstName,
@@ -239,18 +237,6 @@ class UsuarioInfo {
 
 /// Modelo de Viaje Activo
 class ViajeActivo {
-  final String id;
-  final String rutaId;
-  final String rutaNumero;
-  final String estado; // "iniciado", "en_progreso", "finalizado"
-  final double velocidad; // km/h
-  final int tiempoEstimado; // minutos restantes
-  final String ubicacionActual;
-  final String destino;
-  final int paradasRestantes;
-  final double progreso; // 0.0 a 1.0
-  final DateTime horaInicio;
-  final DateTime? horaEstimadaLlegada;
 
   ViajeActivo({
     required this.id,
@@ -283,6 +269,18 @@ class ViajeActivo {
       horaEstimadaLlegada: DateTime.tryParse(json['horaEstimadaLlegada'] ?? ''),
     );
   }
+  final String id;
+  final String rutaId;
+  final String rutaNumero;
+  final String estado; // "iniciado", "en_progreso", "finalizado"
+  final double velocidad; // km/h
+  final int tiempoEstimado; // minutos restantes
+  final String ubicacionActual;
+  final String destino;
+  final int paradasRestantes;
+  final double progreso; // 0.0 a 1.0
+  final DateTime horaInicio;
+  final DateTime? horaEstimadaLlegada;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -302,13 +300,6 @@ class ViajeActivo {
 
 /// Modelo de Usuario
 class Usuario {
-  final String id;
-  final String nombre;
-  final String email;
-  final String rol; // "cliente", "conductor"
-  final String telefono;
-  final String fotoPerfil;
-  final DateTime fechaRegistro;
 
   Usuario({
     required this.id,
@@ -331,6 +322,13 @@ class Usuario {
       fechaRegistro: DateTime.tryParse(json['fechaRegistro'] ?? '') ?? DateTime.now(),
     );
   }
+  final String id;
+  final String nombre;
+  final String email;
+  final String rol; // "cliente", "conductor"
+  final String telefono;
+  final String fotoPerfil;
+  final DateTime fechaRegistro;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -345,10 +343,6 @@ class Usuario {
 
 /// Modelo de Localización
 class Localizacion {
-  final double latitud;
-  final double longitud;
-  final double precision;
-  final DateTime timestamp;
 
   Localizacion({
     required this.latitud,
@@ -365,6 +359,10 @@ class Localizacion {
       timestamp: DateTime.tryParse(json['timestamp'] ?? '') ?? DateTime.now(),
     );
   }
+  final double latitud;
+  final double longitud;
+  final double precision;
+  final DateTime timestamp;
 
   Map<String, dynamic> toJson() => {
     'latitud': latitud,

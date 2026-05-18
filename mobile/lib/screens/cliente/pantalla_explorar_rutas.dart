@@ -118,10 +118,10 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
   void _actualizarMarcadoresYPolylines({List<Ruta>? rutasAMostrar}) {
     final rutasParaMostrar = rutasAMostrar ?? (rutasPopulares + rutasRecientes);
     
-    Set<Marker> nuevosMarcadores = {};
-    Set<Polyline> nuevosPolylines = {};
+    var nuevosMarcadores = <Marker>{};
+    var nuevosPolylines = <Polyline>{};
 
-    for (int i = 0; i < rutasParaMostrar.length; i++) {
+    for (var i = 0; i < rutasParaMostrar.length; i++) {
       final ruta = rutasParaMostrar[i];
       final paradas = ruta.stops;
 
@@ -137,14 +137,14 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
         final colorIndex = i % colores.length;
 
         // Crear marcadores para cada parada
-        for (int j = 0; j < paradas.length; j++) {
+        for (var j = 0; j < paradas.length; j++) {
           final parada = paradas[j];
           final isInicio = j == 0;
           final isFinal = j == paradas.length - 1;
 
           nuevosMarcadores.add(
             Marker(
-              markerId: MarkerId('${ruta.id}_parada_${j}'),
+              markerId: MarkerId('${ruta.id}_parada_$j'),
               position: LatLng(parada.latitude, parada.longitude),
               infoWindow: InfoWindow(
                 title: parada.name,
@@ -235,10 +235,10 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
   void _ajustarCamara(Set<Marker> marcadores) {
     if (marcadores.isEmpty) return;
 
-    double minLat = marcadores.first.position.latitude;
-    double maxLat = marcadores.first.position.latitude;
-    double minLng = marcadores.first.position.longitude;
-    double maxLng = marcadores.first.position.longitude;
+    var minLat = marcadores.first.position.latitude;
+    var maxLat = marcadores.first.position.latitude;
+    var minLng = marcadores.first.position.longitude;
+    var maxLng = marcadores.first.position.longitude;
 
     for (final marker in marcadores) {
       minLat = minLat > marker.position.latitude ? marker.position.latitude : minLat;
@@ -262,8 +262,7 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
@@ -374,10 +373,8 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
         ],
       ),
     );
-  }
 
-  List<Widget> _construirListaRutasNormales() {
-    return [
+  List<Widget> _construirListaRutasNormales() => [
           // Rutas populares
           SliverToBoxAdapter(
             child: Padding(
@@ -532,10 +529,8 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
             child: SizedBox(height: 24),
           ),
         ];
-    }
 
-  Widget _construirCardRutaPopular(Ruta ruta) {
-    return GestureDetector(
+  Widget _construirCardRutaPopular(Ruta ruta) => GestureDetector(
       onTap: () {
         _mostrarDetallesRuta(ruta);
       },
@@ -613,10 +608,8 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
         ),
       ),
     );
-  }
 
-  Widget _construirTarjetaRuta(Ruta ruta) {
-    return GestureDetector(
+  Widget _construirTarjetaRuta(Ruta ruta) => GestureDetector(
       onTap: () => _mostrarDetallesRuta(ruta),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -720,7 +713,6 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
         ),
       ),
     );
-  }
 
   void _mostrarDetallesRuta(Ruta ruta) {
     showModalBottomSheet(
@@ -757,8 +749,7 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
     );
   }
 
-  Widget _construirFila(String label, String value) {
-    return Padding(
+  Widget _construirFila(String label, String value) => Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -779,10 +770,8 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
         ],
       ),
     );
-  }
 
-  Widget _construirItemRutaReciente(Ruta ruta) {
-    return Container(
+  Widget _construirItemRutaReciente(Ruta ruta) => Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -844,6 +833,5 @@ class _PantallaExplorarRutasState extends State<PantallaExplorarRutas> {
         ],
       ),
     );
-  }
 
 }

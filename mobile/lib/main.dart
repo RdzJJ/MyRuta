@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'config/theme.dart';
 import 'config/constants.dart';
-import 'screens/cliente/pantalla_inicio.dart';
-import 'screens/cliente/pantalla_explorar_rutas.dart';
-import 'screens/cliente/pantalla_viaje_activo.dart';
-import 'screens/cliente/pantalla_llegada_en_vivo.dart';
-import 'screens/cliente/pantalla_perfil.dart';
+import 'screens/seleccion_rol.dart';
+import 'screens/cliente/pantalla_navegacion.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,14 +13,12 @@ class MyRutaApp extends StatelessWidget {
   const MyRutaApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       title: 'MyRuta',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const PantallaNavegacion(),
+      home: const PantallaSeleccionRol(),
     );
-  }
 }
 
 /// Pantalla de navegación principal con BottomNavigationBar
@@ -36,7 +31,7 @@ class PantallaNavegacion extends StatefulWidget {
 
 class _PantallaNavegacionState extends State<PantallaNavegacion> {
   int _indiceSeleccionado = 0;
-  bool _viajeActivo = false;
+  final bool _viajeActivo = false;
 
   List<Widget> get _pantallas => [
     const PantallaInicio(),
@@ -47,8 +42,7 @@ class _PantallaNavegacionState extends State<PantallaNavegacion> {
   ];
 
   @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
+  Widget build(BuildContext context) => WillPopScope(
       onWillPop: () async {
         if (_indiceSeleccionado != 0) {
           setState(() => _indiceSeleccionado = 0);
@@ -130,7 +124,6 @@ class _PantallaNavegacionState extends State<PantallaNavegacion> {
         ),
       ),
     );
-  }
 
   void _onTabTapped(int index) {
     setState(() {

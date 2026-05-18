@@ -63,8 +63,7 @@ class _PantallaLlegadaEnVivoState extends State<PantallaLlegadaEnVivo>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
@@ -138,10 +137,8 @@ class _PantallaLlegadaEnVivoState extends State<PantallaLlegadaEnVivo>
         ],
       ),
     );
-  }
 
-  Widget _construirCardLlegada() {
-    return Column(
+  Widget _construirCardLlegada() => Column(
       children: [
         // Mapa con Google Maps
         Padding(
@@ -258,14 +255,12 @@ class _PantallaLlegadaEnVivoState extends State<PantallaLlegadaEnVivo>
         ),
       ],
     );
-  }
 
   Widget _construirBadgeInfo({
     required IconData icono,
     required String label,
     required String valor,
-  }) {
-    return Column(
+  }) => Column(
       children: [
         Icon(icono, color: AppColors.primary, size: 20),
         const SizedBox(height: 6),
@@ -284,10 +279,8 @@ class _PantallaLlegadaEnVivoState extends State<PantallaLlegadaEnVivo>
         ),
       ],
     );
-  }
 
-  Widget _construirInformacionBus() {
-    return Container(
+  Widget _construirInformacionBus() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -338,10 +331,8 @@ class _PantallaLlegadaEnVivoState extends State<PantallaLlegadaEnVivo>
         ],
       ),
     );
-  }
 
-  Widget _construirEstadoTrafico() {
-    return Container(
+  Widget _construirEstadoTrafico() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -407,10 +398,8 @@ class _PantallaLlegadaEnVivoState extends State<PantallaLlegadaEnVivo>
         ],
       ),
     );
-  }
 
-  Widget _construirInformacionConductor() {
-    return Container(
+  Widget _construirInformacionConductor() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -470,10 +459,8 @@ class _PantallaLlegadaEnVivoState extends State<PantallaLlegadaEnVivo>
         ],
       ),
     );
-  }
 
-  Widget _construirBotonesAccion() {
-    return Padding(
+  Widget _construirBotonesAccion() => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         children: [
@@ -508,7 +495,6 @@ class _PantallaLlegadaEnVivoState extends State<PantallaLlegadaEnVivo>
         ],
       ),
     );
-  }
 
   @override
   void dispose() {

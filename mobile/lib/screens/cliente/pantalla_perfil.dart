@@ -34,8 +34,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         title: const Text('Mi Perfil'),
         centerTitle: true,
@@ -111,14 +110,13 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
         ),
       ),
     );
-  }
 
   void _mostrarDialogoEdicion() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text(
+        title: const Text(
           'Editar Perfil',
           style: TextStyle(color: AppColors.textPrimary),
         ),
@@ -182,7 +180,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
               const SizedBox(height: 16),
               // Dropdown Género
               DropdownButtonFormField<String>(
-                value: _genero,
+                initialValue: _genero,
                 style: const TextStyle(color: AppColors.textPrimary),
                 dropdownColor: AppColors.surface,
                 items: ['Masculino', 'Femenino', 'Otro', 'No especificado']
@@ -261,10 +259,10 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
 
     // Mostrar confirmación
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Perfil actualizado exitosamente'),
+      const SnackBar(
+        content: Text('Perfil actualizado exitosamente'),
         backgroundColor: AppColors.primary,
-        duration: const Duration(seconds: 2),
+        duration: Duration(seconds: 2),
       ),
     );
   }
@@ -274,7 +272,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text(
+        title: const Text(
           'Configuración',
           style: TextStyle(color: AppColors.textPrimary),
         ),
@@ -336,7 +334,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text(
+        title: const Text(
           'Notificaciones',
           style: TextStyle(color: AppColors.textPrimary),
         ),
@@ -381,7 +379,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text(
+        title: const Text(
           'Ayuda y Soporte',
           style: TextStyle(color: AppColors.textPrimary),
         ),
@@ -390,7 +388,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 '¡Gracias por usar MyRuta!',
                 style: TextStyle(
                   color: AppColors.textPrimary,
@@ -399,7 +397,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                 ),
               ),
               const SizedBox(height: 12),
-              Text(
+              const Text(
                 'Estamos aquí para ayudarte en cada paso de tu viaje. '
                 'Si tienes preguntas, sugerencias o necesitas asistencia técnica, '
                 'no dudes en contactarnos. Tu satisfacción es nuestra prioridad.',
@@ -417,10 +415,10 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: AppColors.border),
                 ),
-                child: Row(
+                child: const Row(
                   children: [
-                    const Icon(Icons.email, color: AppColors.primary),
-                    const SizedBox(width: 12),
+                    Icon(Icons.email, color: AppColors.primary),
+                    SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'myrutahelp@gmail.com',
@@ -462,11 +460,11 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
   }
 
   Future<void> _enviarCorreo() async {
-    final email = 'myrutahelp@gmail.com';
-    final subject = 'Soporte - MyRuta';
-    final body = 'Hola,\n\nTengo una consulta acerca de MyRuta:\n\n';
+    const email = 'myrutahelp@gmail.com';
+    const subject = 'Soporte - MyRuta';
+    const body = 'Hola,\n\nTengo una consulta acerca de MyRuta:\n\n';
 
-    final Uri emailUri = Uri(
+    final emailUri = Uri(
       scheme: 'mailto',
       path: email,
       queryParameters: {
@@ -501,11 +499,11 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text(
+        title: const Text(
           'Cerrar Sesión',
           style: TextStyle(color: AppColors.textPrimary),
         ),
-        content: Text(
+        content: const Text(
           '¿Estás seguro de que deseas cerrar sesión?',
           style: TextStyle(color: AppColors.textSecondary),
         ),
@@ -541,8 +539,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
-  }) {
-    return ListTile(
+  }) => ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 8),
       leading: Icon(icon, color: AppColors.primary),
       title: Text(
@@ -559,14 +556,12 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
       trailing: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
       onTap: onTap,
     );
-  }
 
   Widget _buildToggleOption({
     required String title,
     required bool value,
     required Function(bool) onChanged,
-  }) {
-    return Row(
+  }) => Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
@@ -585,15 +580,13 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
         ),
       ],
     );
-  }
 
   Widget _buildProfileOption({
     required IconData icon,
     required String title,
     required VoidCallback onTap,
     bool isDangerous = false,
-  }) {
-    return Container(
+  }) => Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -615,5 +608,4 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
         onTap: onTap,
       ),
     );
-  }
 }

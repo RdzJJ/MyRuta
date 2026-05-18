@@ -5,12 +5,6 @@ import '../config/constants.dart';
 
 /// Botón de acción mejorado con icono prominente
 class BotonAccion extends StatefulWidget {
-  final String label;
-  final IconData icon;
-  final VoidCallback onPressed;
-  final Color? backgroundColor;
-  final Color? iconColor;
-  final double size;
 
   const BotonAccion({
     Key? key,
@@ -21,6 +15,12 @@ class BotonAccion extends StatefulWidget {
     this.iconColor,
     this.size = 80,
   }) : super(key: key);
+  final String label;
+  final IconData icon;
+  final VoidCallback onPressed;
+  final Color? backgroundColor;
+  final Color? iconColor;
+  final double size;
 
   @override
   State<BotonAccion> createState() => _BotonAccionState();
@@ -59,8 +59,7 @@ class _BotonAccionState extends State<BotonAccion>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTapDown: _onTapDown,
       onTapUp: _onTapUp,
       onTapCancel: _onTapCancel,
@@ -108,19 +107,10 @@ class _BotonAccionState extends State<BotonAccion>
         ),
       ),
     );
-  }
 }
 
 /// Botón principal personalizado
 class BotonPrincipal extends StatelessWidget {
-  final String texto;
-  final VoidCallback onPressed;
-  final bool isLoading;
-  final Color? backgroundColor;
-  final Color? textColor;
-  final double? width;
-  final IconData? icon;
-  final bool esSecundario;
 
   const BotonPrincipal({
     Key? key,
@@ -133,6 +123,14 @@ class BotonPrincipal extends StatelessWidget {
     this.icon,
     this.esSecundario = false,
   }) : super(key: key);
+  final String texto;
+  final VoidCallback onPressed;
+  final bool isLoading;
+  final Color? backgroundColor;
+  final Color? textColor;
+  final double? width;
+  final IconData? icon;
+  final bool esSecundario;
 
   @override
   Widget build(BuildContext context) {
@@ -223,14 +221,6 @@ class BotonPrincipal extends StatelessWidget {
 
 /// Card de Ruta - Componente reutilizable
 class CardRuta extends StatelessWidget {
-  final String numero;
-  final String nombre;
-  final String linea;
-  final double distancia;
-  final int tiempoEstimado;
-  final bool enVivo;
-  final VoidCallback onTap;
-  final String? imagenUrl;
 
   const CardRuta({
     Key? key,
@@ -243,10 +233,17 @@ class CardRuta extends StatelessWidget {
     required this.onTap,
     this.imagenUrl,
   }) : super(key: key);
+  final String numero;
+  final String nombre;
+  final String linea;
+  final double distancia;
+  final int tiempoEstimado;
+  final bool enVivo;
+  final VoidCallback onTap;
+  final String? imagenUrl;
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -367,16 +364,10 @@ class CardRuta extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 /// Header personalizado con búsqueda
 class HeaderBusqueda extends StatelessWidget {
-  final String hint;
-  final TextEditingController? controller;
-  final ValueChanged<String>? onChanged;
-  final VoidCallback? onSearch;
-  final Icon? prefixIcon;
 
   const HeaderBusqueda({
     Key? key,
@@ -386,10 +377,14 @@ class HeaderBusqueda extends StatelessWidget {
     this.onSearch,
     this.prefixIcon,
   }) : super(key: key);
+  final String hint;
+  final TextEditingController? controller;
+  final ValueChanged<String>? onChanged;
+  final VoidCallback? onSearch;
+  final Icon? prefixIcon;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       padding: const EdgeInsets.all(16),
       child: TextField(
         controller: controller,
@@ -435,14 +430,10 @@ class HeaderBusqueda extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 /// Indicador de estado
 class IndicadorEstado extends StatelessWidget {
-  final String estado;
-  final bool enLivo;
-  final double? tamano;
 
   const IndicadorEstado({
     Key? key,
@@ -450,10 +441,12 @@ class IndicadorEstado extends StatelessWidget {
     this.enLivo = false,
     this.tamano,
   }) : super(key: key);
+  final String estado;
+  final bool enLivo;
+  final double? tamano;
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
+  Widget build(BuildContext context) => Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
@@ -473,14 +466,10 @@ class IndicadorEstado extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 /// Loading Skeleton
 class LoadingSkeleton extends StatelessWidget {
-  final double? width;
-  final double height;
-  final BorderRadius borderRadius;
 
   const LoadingSkeleton({
     Key? key,
@@ -489,10 +478,12 @@ class LoadingSkeleton extends StatelessWidget {
     BorderRadius? borderRadius,
   })  : borderRadius = borderRadius ?? const BorderRadius.all(Radius.circular(8)),
         super(key: key);
+  final double? width;
+  final double height;
+  final BorderRadius borderRadius;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
@@ -500,18 +491,10 @@ class LoadingSkeleton extends StatelessWidget {
         borderRadius: borderRadius,
       ),
     );
-  }
 }
 
 /// Botón con icono y etiqueta - Mejorado
 class BotonIconoEtiqueta extends StatelessWidget {
-  final String etiqueta;
-  final IconData icon;
-  final VoidCallback onPressed;
-  final Color? backgroundColor;
-  final Color? iconColor;
-  final Color? textColor;
-  final double? width;
 
   const BotonIconoEtiqueta({
     Key? key,
@@ -523,10 +506,16 @@ class BotonIconoEtiqueta extends StatelessWidget {
     this.textColor,
     this.width,
   }) : super(key: key);
+  final String etiqueta;
+  final IconData icon;
+  final VoidCallback onPressed;
+  final Color? backgroundColor;
+  final Color? iconColor;
+  final Color? textColor;
+  final double? width;
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
+  Widget build(BuildContext context) => SizedBox(
       width: width ?? double.infinity,
       child: ElevatedButton.icon(
         onPressed: onPressed,
@@ -544,16 +533,10 @@ class BotonIconoEtiqueta extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 /// Tarjeta de acción mejorada
 class TarjetaAccion extends StatelessWidget {
-  final String titulo;
-  final String descripcion;
-  final IconData icon;
-  final VoidCallback onTap;
-  final Color? accentColor;
 
   const TarjetaAccion({
     Key? key,
@@ -563,10 +546,14 @@ class TarjetaAccion extends StatelessWidget {
     required this.onTap,
     this.accentColor,
   }) : super(key: key);
+  final String titulo;
+  final String descripcion;
+  final IconData icon;
+  final VoidCallback onTap;
+  final Color? accentColor;
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(20),
@@ -630,17 +617,10 @@ class TarjetaAccion extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 /// Widget de Mapa - Google Maps integrado
 class MapaGoogle extends StatefulWidget {
-  final LatLng ubicacionInicial;
-  final Set<Marker>? markers;
-  final Set<Polyline>? polylines;
-  final void Function(GoogleMapController)? onMapCreated;
-  final double altura;
-  final bool mostrarControles;
 
   const MapaGoogle({
     Key? key,
@@ -651,6 +631,12 @@ class MapaGoogle extends StatefulWidget {
     this.altura = 300,
     this.mostrarControles = true,
   }) : super(key: key);
+  final LatLng ubicacionInicial;
+  final Set<Marker>? markers;
+  final Set<Polyline>? polylines;
+  final void Function(GoogleMapController)? onMapCreated;
+  final double altura;
+  final bool mostrarControles;
 
   @override
   State<MapaGoogle> createState() => _MapaGoogleState();
@@ -660,8 +646,7 @@ class _MapaGoogleState extends State<MapaGoogle> {
   late GoogleMapController _mapController;
 
   @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
+  Widget build(BuildContext context) => ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: Container(
         height: widget.altura,
@@ -731,17 +716,16 @@ class _MapaGoogleState extends State<MapaGoogle> {
       ),
       ),
     );
-  }
 }
 
 /// Badge de estado en vivo
 class BadgeEnVivo extends StatefulWidget {
-  final Duration? duracionAnimacion;
 
   const BadgeEnVivo({
     Key? key,
     this.duracionAnimacion,
   }) : super(key: key);
+  final Duration? duracionAnimacion;
 
   @override
   State<BadgeEnVivo> createState() => _BadgeEnVivoState();
@@ -767,8 +751,7 @@ class _BadgeEnVivoState extends State<BadgeEnVivo>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return ScaleTransition(
+  Widget build(BuildContext context) => ScaleTransition(
       scale: Tween(begin: 0.8, end: 1.0).animate(
         CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
       ),
@@ -802,5 +785,4 @@ class _BadgeEnVivoState extends State<BadgeEnVivo>
         ),
       ),
     );
-  }
 }

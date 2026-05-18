@@ -85,8 +85,7 @@ class _PantallaViajeActivoState extends State<PantallaViajeActivo>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
@@ -183,10 +182,8 @@ class _PantallaViajeActivoState extends State<PantallaViajeActivo>
         ],
       ),
     );
-  }
 
-  Widget _construirMapaViaje() {
-    return Padding(
+  Widget _construirMapaViaje() => Padding(
       padding: const EdgeInsets.all(16),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
@@ -267,10 +264,8 @@ class _PantallaViajeActivoState extends State<PantallaViajeActivo>
         ),
       ),
     );
-  }
 
-  Widget _construirCardViajeDetalles() {
-    return Container(
+  Widget _construirCardViajeDetalles() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -336,14 +331,12 @@ class _PantallaViajeActivoState extends State<PantallaViajeActivo>
         ],
       ),
     );
-  }
 
   Widget _construirInfoDetalle({
     required IconData icono,
     required String etiqueta,
     required String valor,
-  }) {
-    return Column(
+  }) => Column(
       children: [
         Icon(icono, color: AppColors.primary, size: 24),
         const SizedBox(height: 8),
@@ -362,10 +355,8 @@ class _PantallaViajeActivoState extends State<PantallaViajeActivo>
         ),
       ],
     );
-  }
 
-  Widget _construirSeccionEstadoTrafico() {
-    return Container(
+  Widget _construirSeccionEstadoTrafico() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -439,10 +430,8 @@ class _PantallaViajeActivoState extends State<PantallaViajeActivo>
         ],
       ),
     );
-  }
 
-  Widget _construirSeccionProximasParadas() {
-    return Container(
+  Widget _construirSeccionProximasParadas() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -519,10 +508,8 @@ class _PantallaViajeActivoState extends State<PantallaViajeActivo>
         ],
       ),
     );
-  }
 
-  Widget _construirBotonesAccion() {
-    return Padding(
+  Widget _construirBotonesAccion() => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         children: [
@@ -562,7 +549,6 @@ class _PantallaViajeActivoState extends State<PantallaViajeActivo>
         ],
       ),
     );
-  }
 
   @override
   void dispose() {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
+import 'pantalla_inicio_conductor.dart';
 
 class PantallaLoginConductor extends StatefulWidget {
   const PantallaLoginConductor({Key? key}) : super(key: key);
@@ -22,8 +23,7 @@ class _PantallaLoginConductorState extends State<PantallaLoginConductor> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       body: SingleChildScrollView(
         child: Container(
           height: MediaQuery.of(context).size.height,
@@ -282,7 +282,6 @@ class _PantallaLoginConductorState extends State<PantallaLoginConductor> {
         ),
       ),
     );
-  }
 
   void _iniciarSesion() {
     final email = _emailController.text.trim();
@@ -305,9 +304,10 @@ class _PantallaLoginConductorState extends State<PantallaLoginConductor> {
       setState(() => _isLoading = false);
 
       // Aquí iría la validación real con el backend
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        '/home_conductor',
-        (Route<dynamic> route) => false,
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => const PantallaInicioConductor(),
+        ),
       );
     });
   }
@@ -317,14 +317,14 @@ class _PantallaLoginConductorState extends State<PantallaLoginConductor> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text(
+        title: const Text(
           'Recuperar Contraseña',
           style: TextStyle(color: AppColors.textPrimary),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            const Text(
               'Ingresa tu correo para recibir instrucciones de recuperación',
               style: TextStyle(color: AppColors.textSecondary),
             ),
@@ -388,7 +388,7 @@ class _PantallaLoginConductorState extends State<PantallaLoginConductor> {
   }
 
   bool _esCorreoValido(String email) {
-    final pattern = r'^[^@]+@[^@]+\.[^@]+$';
+    const pattern = r'^[^@]+@[^@]+\.[^@]+$';
     return RegExp(pattern).hasMatch(email);
   }
 
@@ -400,30 +400,5 @@ class _PantallaLoginConductorState extends State<PantallaLoginConductor> {
         duration: const Duration(seconds: 2),
       ),
     );
-  }
-}
-
-// Detectar gestos en el texto
-class TapGestureRecognizer extends GestureRecognizer {
-  VoidCallback? onTap;
-
-  @override
-  void addPointer(PointerDownEvent event) {
-    startTrackingPointer(event.pointer);
-  }
-
-  @override
-  String get debugDescription => 'tap';
-
-  @override
-  void didExitEvent(PointerExitEvent event) {
-    stopTrackingPointer(event.pointer);
-  }
-
-  @override
-  void handleEvent(PointerEvent event) {
-    if (event is PointerUpEvent) {
-      onTap?.call();
-    }
   }
 }

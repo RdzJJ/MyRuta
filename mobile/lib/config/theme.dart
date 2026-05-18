@@ -48,7 +48,6 @@ class AppTheme {
       secondary: AppColors.primaryLight,
       surface: AppColors.surface,
       error: AppColors.error,
-      background: AppColors.background,
     ),
 
     // AppBar
