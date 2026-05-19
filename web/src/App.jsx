@@ -5,6 +5,7 @@ import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
 import NotFoundPage from './pages/NotFoundPage'
+import Footer from './components/Layout/Footer'
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard'
@@ -12,6 +13,7 @@ import AdminLiveMap from './pages/admin/LiveMap'
 import AdminReportes from './pages/admin/Reportes'
 import AdminRutas from './pages/admin/GestionRutas'
 import AdminConductores from './pages/admin/GestionConductores'
+import GestionBuses from './pages/admin/GestionBuses'
 
 // Cliente Pages (Public Access)
 import ClienteHome from './pages/cliente/Home'
@@ -78,6 +80,13 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/admin/buses"
+                  element={
+                    <ProtectedRoute adminOnly>
+                      <GestionBuses />
+                    </ProtectedRoute>
+                  } />
 
                 <Route
                   path="/admin/rutas"
@@ -101,6 +110,7 @@ function App() {
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </main>
+            <Footer />
           </div>
         </LocationProvider>
       </AuthProvider>
