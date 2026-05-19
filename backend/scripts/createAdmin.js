@@ -2,8 +2,8 @@ import 'dotenv/config'
 import { adminAuth, adminDb } from '../src/config/firebase.js'
 
 async function createAdmin() {
-  const email = 'admin@myruta.com'
-  const password = 'Admin123!'
+  const email = ''
+  const password = ''
 
   try {
     // Crear en Firebase Auth
