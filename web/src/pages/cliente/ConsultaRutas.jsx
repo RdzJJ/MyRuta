@@ -9,11 +9,12 @@ const esRutaActiva = (ruta) =>
   ruta.status === 'active' || ruta.estado === 'Activa'
 
 export default function ConsultaRutas() {
-  const [originLocation, setOriginLocation]           = useState(null)
+  const [originLocation, setOriginLocation] = useState(null)
   const [destinationLocation, setDestinationLocation] = useState(null)
-  const [todasLasRutas, setTodasLasRutas]             = useState([])
-  const [results, setResults]                         = useState([])
-  const [isLoading, setIsLoading]                     = useState(true)
+  const [todasLasRutas, setTodasLasRutas] = useState([])
+  const [results, setResults] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [selectedRuta, setSelectedRuta] = useState(null)
 
   useEffect(() => {
     const cargar = async () => {
@@ -80,6 +81,7 @@ export default function ConsultaRutas() {
           <MedellinMap
             selectedLocation={destinationLocation}
             originLocation={originLocation}
+            selectedRuta={selectedRuta}
             className="rounded-xl"
           />
         </div>
@@ -176,11 +178,10 @@ export default function ConsultaRutas() {
                           )}
                         </div>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        activa
-                          ? 'bg-neon-500 bg-opacity-20 text-neon-500'
-                          : 'bg-red-500 bg-opacity-20 text-red-400'
-                      }`}>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${activa
+                        ? 'bg-neon-500 bg-opacity-20 text-neon-500'
+                        : 'bg-red-500 bg-opacity-20 text-red-400'
+                        }`}>
                         {activa ? '🟢 Activa' : '🔴 Inactiva'}
                       </span>
                     </div>
@@ -204,9 +205,10 @@ export default function ConsultaRutas() {
                       </div>
                       <div className="text-right">
                         <button
+                          onClick={() => setSelectedRuta(selectedRuta?.id === ruta.id ? null : ruta)}
                           className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-2 px-6 rounded-lg hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
                           style={{ boxShadow: '0 0 10px rgba(0, 255, 65, 0.3)' }}>
-                          ✓ Seleccionar
+                          {selectedRuta?.id === ruta.id ? '✖ Deseleccionar' : '✓ Seleccionar'}
                         </button>
                       </div>
                     </div>
