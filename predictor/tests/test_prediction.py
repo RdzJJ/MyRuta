@@ -89,7 +89,6 @@ class TestHealthEndpoints:
     """Test health check endpoints"""
 
     def test_health_check(self, client):
-    def test_health_check(self):
         """Test basic health check endpoint"""
         response = client.get("/api/health/")
         assert response.status_code == 200
@@ -104,15 +103,6 @@ class TestHealthEndpoints:
         assert response.status_code == 200
         data = response.json()
         assert "status" in data
-
-    def test_liveness_check(self, client):
-        assert "status" in data
-        assert data["status"] in ["healthy", "degraded", "unhealthy"]
-        assert "database" in data
-        assert "model_loaded" in data
-        assert "uptime_seconds" in data
-        assert "version" in data
-        assert "timestamp" in data
 
     def test_readiness_check(self):
         """Test readiness probe"""
@@ -154,9 +144,6 @@ class TestPredictionEndpoints:
     def valid_prediction_request(self):
         """Create a valid prediction request"""
         return {
-    def test_single_prediction(self):
-        """Test single route prediction"""
-        request_data = {
             "route_id": "R001",
             "scheduled_departure": datetime.utcnow().isoformat(),
             "current_location": {"latitude": 40.7128, "longitude": -74.0060},
@@ -238,22 +225,6 @@ class TestPredictionEndpoints:
         # Should either accept it or reject with 422
         assert response.status_code in [200, 422]
 
-    def test_batch_predictions(self, client):
-        """Test batch predictions"""
-        batch_requests = {
-            "requests": [
-        }
-        response = client.post("/api/predictions/predict", json=request_data)
-        assert response.status_code == 200
-        data = response.json()
-        assert "predicted_delay_minutes" in data
-        assert "route_id" in data
-        assert "confidence" in data
-        assert 0 <= data["confidence"] <= 1
-        assert "predicted_arrival" in data
-        assert "is_delayed" in data
-        assert isinstance(data["is_delayed"], bool)
-
     def test_batch_predictions(self):
         """Test batch predictions"""
         request_data = {
@@ -308,7 +279,6 @@ class TestAnalyticsEndpoints:
     """Test analytics API endpoints"""
 
     def test_get_model_metrics(self, client):
-    def test_get_model_metrics(self):
         """Test model metrics endpoint"""
         response = client.get("/api/analytics/metrics")
         assert response.status_code == 200
@@ -617,20 +587,6 @@ class TestDataValidation:
         """Test that vehicle_id is optional"""
         request = {"route_id": "R001"}
         assert "vehicle_id" not in request
-
-    @pytest.mark.asyncio
-    async def test_missing_fields(self):
-    def test_invalid_coordinates(self):
-        """Test with invalid GPS coordinates"""
-        request_data = {
-            "route_id": "R001",
-            "scheduled_departure": datetime.utcnow().isoformat(),
-            "current_location": {"latitude": 100.0, "longitude": -74.0060},  # Invalid latitude
-            "destination": {"latitude": 40.7489, "longitude": -73.9680},
-            "stops_remaining": 5,
-        }
-        response = client.post("/api/predictions/predict", json=request_data)
-        assert response.status_code == 422  # Validation error
 
     def test_missing_fields(self):
         """Test with missing required fields"""
