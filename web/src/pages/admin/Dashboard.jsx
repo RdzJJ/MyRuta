@@ -8,11 +8,13 @@
  */
 
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import AdminRealtimeMap from '../../components/Maps/AdminRealtimeMap'
 import HistorialRecorridos from '../../components/admin/HistorialRecorridos'
 import { getBuses, getRutas } from '../../services/firestoreService'
 
 export default function Dashboard() {
+  const navigate = useNavigate()
   const [stats, setStats] = useState({
     rutasActivas: 0,
     conductores: 0,
@@ -86,15 +88,27 @@ export default function Dashboard() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {['Crear Nueva Ruta', 'Gestionar Conductores', 'Ver Reportes'].map((action, idx) => (
-            <button
-              key={idx}
-              className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-4 px-6 rounded-xl hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
-              style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.4)' }}
-            >
-              {action}
-            </button>
-          ))}
+          <button
+            onClick={() => navigate('/admin/rutas')}
+            className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-4 px-6 rounded-xl hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
+            style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.4)' }}
+          >
+            Crear Nueva Ruta
+          </button>
+          <button
+            onClick={() => navigate('/admin/conductores')}
+            className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-4 px-6 rounded-xl hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
+            style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.4)' }}
+          >
+            Gestionar Conductores
+          </button>
+          <button
+            onClick={() => navigate('/admin/reportes')}
+            className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-4 px-6 rounded-xl hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
+            style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.4)' }}
+          >
+            Ver Reportes
+          </button>
         </div>
       </main>
     </div>

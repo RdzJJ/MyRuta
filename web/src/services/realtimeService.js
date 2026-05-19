@@ -50,3 +50,17 @@ export function subscribeToAllLocations(callback) {
   })
   return () => off(locationsRef)
 }
+
+/**
+ * Inicializar ubicación por defecto para pruebas
+ * Centro de Medellín: 6.2442° N, 75.5812° W
+ */
+export async function initializeDefaultLocation(conductorId, busId, rutaId) {
+  await publishLocation(conductorId, {
+    lat: 6.2442,
+    lng: -75.5812,
+    velocidad: 25.5,
+    busId,
+    rutaId
+  })
+}

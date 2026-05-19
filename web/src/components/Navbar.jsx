@@ -1,13 +1,3 @@
-/**
- * MyRuta Web - Navbar Component
- * 
- * Displays navigation bar with:
- * - App logo/title
- * - Login button (for guests)
- * - User menu (for authenticated users)
- * - Role indicator
- */
-
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 

@@ -21,6 +21,7 @@ import {
 import { getETA, formatETA } from "../../services/etaService"
 import { subscribeToAllLocations } from "../../services/realtimeService"
 import { detectarDesvio, crearAlerta, TIPOS_ALERTA } from "../../services/alertasService"
+import { formatTime, formatTimeAgo } from "../../utils/dateFormatter"
 
 export default function AdminRealtimeMap() {
   const [isLoading, setIsLoading] = useState(true)
@@ -237,8 +238,8 @@ export default function AdminRealtimeMap() {
                       <td className="py-4 px-6 text-neon-500 text-sm opacity-90">
                         {etas[bus.id] || "Calculando..."}
                       </td>
-                      <td className="py-4 px-6 text-neon-500 opacity-60 text-xs">
-                        {new Date(bus.timestamp).toLocaleTimeString("es-CO")}
+                      <td className="py-4 px-6 text-neon-500 opacity-60 text-xs" title={formatTime(bus.timestamp)}>
+                        {formatTimeAgo(bus.timestamp)}
                       </td>
                     </tr>
                   )

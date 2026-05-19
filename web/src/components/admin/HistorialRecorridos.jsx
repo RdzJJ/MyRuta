@@ -14,6 +14,7 @@ import {
   getRutas
 } from '../../services/firestoreService'
 import { formatETA } from '../../services/etaService'
+import { formatDateTime } from '../../utils/dateFormatter'
 
 export default function HistorialRecorridos() {
   const [historial, setHistorial] = useState([])
@@ -116,10 +117,7 @@ export default function HistorialRecorridos() {
                     className="border-b border-neon-500 border-opacity-30 hover:bg-dark-700 transition"
                   >
                     <td className="py-4 px-6 text-neon-500 font-semibold">
-                      {new Date(registro.fecha).toLocaleString('es-CO', {
-                        dateStyle: 'short',
-                        timeStyle: 'short'
-                      })}
+                      {formatDateTime(registro.fecha)}
                     </td>
                     <td className="py-4 px-6 text-neon-500 font-mono font-bold">
                       {registro.busPlaca}
