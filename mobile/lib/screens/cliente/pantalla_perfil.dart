@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../config/theme.dart';
+import '../../services/auth_service.dart';
 
 class PantallaPerfil extends StatefulWidget {
   const PantallaPerfil({Key? key}) : super(key: key);
@@ -102,7 +103,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
             ),
             _buildProfileOption(
               icon: Icons.logout,
-              title: 'Cerrar Sesión',
+              title: 'Salir',
               onTap: _cerrarSesion,
               isDangerous: true,
             ),
@@ -500,11 +501,11 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surface,
         title: const Text(
-          'Cerrar Sesión',
+          'Salir',
           style: TextStyle(color: AppColors.textPrimary),
         ),
         content: const Text(
-          '¿Estás seguro de que deseas cerrar sesión?',
+          '¿Estás seguro de que deseas salir de tu cuenta?',
           style: TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
@@ -520,17 +521,24 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                '/login',
-                (Route<dynamic> route) => false,
-              );
+              await _salir();
             },
-            child: const Text('Cerrar Sesión'),
+            child: const Text('Salir'),
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _salir() async {
+    await AuthService().cerrarSesion();
+
+    // Navegar a la pantalla de login/selección de rol y limpiar stack
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      '/login',
+      (Route<dynamic> route) => false,
     );
   }
 

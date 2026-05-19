@@ -19,11 +19,14 @@ class MyRutaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      title: 'MyRuta',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
-      home: const PantallaSeleccionRol(),
-    );
+        title: 'MyRuta',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.darkTheme,
+        home: const PantallaSeleccionRol(),
+        routes: {
+          '/login': (context) => const PantallaSeleccionRol(),
+        },
+      );
 }
 
 /// Pantalla de navegación principal con BottomNavigationBar
