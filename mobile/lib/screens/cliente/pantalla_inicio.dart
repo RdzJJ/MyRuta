@@ -18,6 +18,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
   final TextEditingController _destinoController = TextEditingController();
   List<Ruta> rutasCercanas = [];
   bool isLoading = false;
+  bool _mostrarMarcadores = false;
   
   // Google Maps
   late GoogleMapController _mapController;
@@ -36,28 +37,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
   }
 
   void _inicializarMarcadores() {
-    markers = {
-      // Marcador de ubicación del usuario
-      Marker(
-        markerId: const MarkerId('usuario'),
-        position: medellinLocation,
-        infoWindow: const InfoWindow(title: 'Tu ubicación'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-      ),
-      // Marcadores de buses cercanos
-      Marker(
-        markerId: const MarkerId('ruta_135'),
-        position: const LatLng(6.2450, -75.5890),
-        infoWindow: const InfoWindow(title: 'Ruta 135', snippet: 'A 2.5 km'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
-      ),
-      Marker(
-        markerId: const MarkerId('ruta_301'),
-        position: const LatLng(6.2430, -75.5910),
-        infoWindow: const InfoWindow(title: 'Ruta 301', snippet: 'A 3.2 km'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
-      ),
-    };
+    markers = {};
   }
 
   void _cargarRutasCercanas() {
@@ -378,6 +358,8 @@ class _PantallaInicioState extends State<PantallaInicio> {
   }
 
   void _actualizarMarcadores() {
+    if (!_mostrarMarcadores) return;
+
     markers = {
       // Marcador de ubicación del usuario
       Marker(
@@ -445,7 +427,11 @@ class _PantallaInicioState extends State<PantallaInicio> {
       ),
     );
 
-    setState(() => isLoading = true);
+    setState(() {
+      isLoading = true;
+      _mostrarMarcadores = true;
+      _actualizarMarcadores();
+    });
 
     // Animar el mapa hacia el centro entre origen y destino
     _animarMapaAlCentro();
