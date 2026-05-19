@@ -15,37 +15,6 @@ const MEDELLIN_BIAS = {
 
 const REGION_CODES = ['co'] // Colombia
 
-let placesService = null
-
-/**
- * Initialize Places Service
- * Loads Google Places API library and creates service instance
- */
-export async function initializePlacesService() {
-  if (placesService) return placesService
-
-  return new Promise((resolve, reject) => {
-    // Load Google Maps API script with Places library
-    const script = document.createElement('script')
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`
-    script.async = true
-    script.defer = true
-    script.onload = () => {
-      try {
-        const { AutocompleteSuggestion } = google.maps.places
-        placesService = AutocompleteSuggestion
-        resolve(placesService)
-      } catch (error) {
-        reject(new Error('Failed to initialize Places API: ' + error.message))
-      }
-    }
-    script.onerror = () => {
-      reject(new Error('Failed to load Google Maps API script'))
-    }
-    document.head.appendChild(script)
-  })
-}
-
 /**
  * Get autocomplete suggestions for a search input
  * @param {string} input - User search input
@@ -67,13 +36,16 @@ export async function getAutocompleteSuggestions(input) {
       language: 'es' // Spanish for better results
     }
 
-    const sessionToken = new google.maps.places.AutocompleteSessionToken()
+    const { AutocompleteService, AutocompleteSessionToken, PlacesServiceStatus } =
+      await google.maps.importLibrary('places')
+
+    const sessionToken = new AutocompleteSessionToken()
     request.sessionToken = sessionToken
 
-    const service = new google.maps.places.AutocompleteService()
+    const service = new AutocompleteService()
     const response = await new Promise((res, rej) =>
       service.getPlacePredictions(request, (predictions, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) res({ predictions })
+        if (status === PlacesServiceStatus.OK) res({ predictions })
         else rej(new Error(`Autocomplete error: ${status}`))
       })
     )
@@ -100,40 +72,44 @@ export async function getAutocompleteSuggestions(input) {
  * @returns {Promise<Object>} Place details including location
  */
 export async function getPlaceDetails(placeId) {
-  if (!placeId) {
-    throw new Error('placeId is required')
-  }
+  if (!placeId) throw new Error('placeId is required')
 
-  try {
-    // Nueva API Place (reemplaza PlacesService deprecada)
-    const { Place } = await google.maps.importLibrary('places')
-
-    const place = new Place({
-      id: placeId,
-      requestedLanguage: 'es'
-    })
-
-    await place.fetchFields({
-      fields: ['displayName', 'formattedAddress', 'location', 'photos', 'types']
-    })
-
-    if (!place.location) {
-      throw new Error('No se encontró ubicación para este lugar')
+  return new Promise((resolve, reject) => {
+    if (!window.google?.maps?.places) {
+      reject(new Error('Google Maps Places no está cargado'))
+      return
     }
 
-    return {
-      placeId,
-      displayName: place.displayName || place.formattedAddress || '',
-      address: place.formattedAddress || '',
-      latitude: place.location.lat(),
-      longitude: place.location.lng(),
-      photos: place.photos?.map(photo => photo.getURI({ maxWidth: 400, maxHeight: 400 })) || [],
-      types: place.types || []
-    }
-  } catch (error) {
-    console.error('Error fetching place details:', error)
-    throw new Error('Failed to fetch place details: ' + error.message)
-  }
+    const service = new google.maps.places.PlacesService(
+      document.createElement('div')
+    )
+
+    service.getDetails(
+      {
+        placeId,
+        fields: ['geometry', 'name', 'formatted_address', 'types'],
+        language: 'es'
+      },
+      (place, status) => {
+        if (
+          status === google.maps.places.PlacesServiceStatus.OK &&
+          place?.geometry?.location
+        ) {
+          resolve({
+            placeId,
+            displayName: place.name || place.formatted_address || '',
+            address: place.formatted_address || '',
+            latitude: place.geometry.location.lat(),
+            longitude: place.geometry.location.lng(),
+            photos: [],
+            types: place.types || []
+          })
+        } else {
+          reject(new Error(`Failed to fetch place details: ${status}`))
+        }
+      }
+    )
+  })
 }
 
 /**
@@ -176,7 +152,6 @@ export async function getUserLocation() {
 }
 
 export default {
-  initializePlacesService,
   getAutocompleteSuggestions,
   getPlaceDetails,
   getUserLocation

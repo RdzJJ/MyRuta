@@ -126,7 +126,7 @@ function loadGoogleMaps(apiKey) {
       delete window[callbackName]
       resolve()
     }
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=${callbackName}&loading=async&libraries=places`
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=${callbackName}&loading=async&libraries=places&v=weekly`
     script.async = true
     script.defer = true
     script.onerror = () => {
