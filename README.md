@@ -1,46 +1,136 @@
-# MyRuta - Sistema de Monitoreo de Rutas de Transporte Público
+# 🚌 MyRuta
 
-Sistema integral de monitoreo en tiempo real para rutas de transporte público urbano. Incluye predicción de demoras mediante machine learning, seguimiento de conductores GPS, y consulta de horarios en vivo.
+**Sistema integral de monitoreo en tiempo real para transporte público urbano**
 
-**Estado del Proyecto**: Scaffolding Completo ✅ (150+ archivos, 15,000+ líneas de código)  
+Plataforma completa que permite rastrear conductores mediante GPS, predecir demoras automáticamente, y consultar horarios actualizados en vivo. Incluye dashboard administrativo, app para conductores, interfaz para pasajeros, y sistema de inteligencia artificial para optimizar rutas.
+
 **Versión**: 1.0.0  
-**Última Actualización**: Marzo 2026
-
-## 📋 Contenido
-
-- [Descripción General](#descripción-general)
-- [Stack Tecnológico](#stack-tecnológico)
-- [Estructura del Proyecto](#estructura-del-proyecto)
-- [Instalación y Configuración](#instalación-y-configuración)
-- [Ejecución Local](#ejecución-local)
-- [Documentación de Componentes](#documentación-de-componentes)
-- [Integración y APIs](#integración-y-apis)
-- [Roles y Control de Acceso](#roles-y-control-de-acceso)
+**Estado**: Scaffolding Completo ✅  
+**Última actualización**: Mayo 2026
 
 ---
 
-## 🎯 Descripción General
+## ✨ Características
 
-MyRuta es un sistema completo de monitoreo de transporte público que proporciona:
+### 🗺️ Monitoreo en Tiempo Real
+- Rastreo GPS de conductores en vivo
+- Mapa interactivo con ubicación de buses
+- Actualización de posición cada 5-10 segundos vía WebSocket
 
-- **Backend API**: Servidor Express.js con WebSocket en tiempo real
-- **Frontend Web**: Interfaz React moderna para dashboards administrativos
-- **Aplicación Móvil**: App Flutter para conductores y pasajeros
-- **Servicio ML**: Predictor FastAPI para estimar demoras automáticamente
-- **Infraestructura**: Docker Compose con PostgreSQL y Redis
+### 🤖 Predicción de Demoras (IA)
+- Modelo machine learning para estimar tiempos de llegada
+- Análisis de patrones históricos de tráfico
+- Alertas automáticas de demoras significativas
+
+### 👥 Múltiples Perfiles
+- **Administradores**: Panel de control completo
+- **Conductores**: Tracking y reportes de incidentes
+- **Pasajeros**: Búsqueda de rutas y ETAs
+
+### 📊 Reportes e Incidentes
+- Sistema de reportes de problemas
+- Historial de viajes
+- Análisis de rutas y conductores
+- Métricas de desempeño
+
+### 🔔 Notificaciones
+- Alertas de demoras
+- Cambios de ruta
+- Mensajes a pasajeros
 
 ---
 
-## 🛠️ Stack Tecnológico
+## 🛠️ Tecnologías
 
-| Componente | Lenguaje | Framework | Versión |
-|-----------|----------|-----------|---------|
-| **Backend** | Node.js | Express.js, Socket.io, Prisma | 18+ |
-| **Frontend Web** | JavaScript/React | Vite, Tailwind CSS, React Router | 18.2.0 |
-| **Aplicación Móvil** | Dart | Flutter, Provider | 3.10+ |
-| **Predictor ML** | Python | FastAPI, scikit-learn, pandas | 3.10+ |
-| **Base de Datos** | PostgreSQL | Prisma ORM | 15 |
-| **Cache** | Redis | - | 7 |
+| Componente | Stack | Detalles |
+|-----------|-------|---------|
+| **Backend** | Node.js 18+ | Express.js, Socket.io, Prisma ORM |
+| **Frontend** | React 18.2.0 | Vite, Tailwind CSS, React Router |
+| **Mobile** | Flutter 3.10+ | Provider (state), Geolocator (GPS) |
+| **IA/ML** | Python 3.10+ | FastAPI, scikit-learn, pandas |
+| **Base de Datos** | Firebase | Firestore, Authentication, RTDB |
+| **Real-time** | WebSocket | Socket.io para eventos en vivo |
+| **Caché** | Redis 7 | Sesiones y datos temporales |
+| **Cache External** | Google Maps | Maps API para visualización |
+
+---
+
+## 🗄️ Base de Datos (Firebase)
+
+### Firestore Collections
+```
+users/                  # Usuarios (auth + perfil)
+conductores/           # Conductores activos
+rutas/                 # Rutas disponibles
+paradas/               # Paradas por ruta
+ubicaciones/           # Historial GPS
+viajes/                # Viajes completados
+incidentes/            # Reportes de problemas
+predicciones/          # Histórico de predicciones
+```
+
+### Características Firebase
+- **Authentication**: Email/contraseña con JWT
+- **Firestore**: Base de datos NoSQL tiempo real
+- **Realtime Database**: Sincronización instantánea
+- **Security Rules**: Control de acceso por rol
+
+---
+
+## 🔧 Servicios Activos
+
+### Backend Services (Node.js)
+
+| Servicio | Responsabilidad |
+|----------|----------------|
+| **authService.js** | Registro, login, renovación JWT, validación de tokens |
+| **conductorService.js** | CRUD conductores, asignación de rutas, estado online |
+| **locationService.js** | Tracking GPS, cálculo de distancias, posición actual |
+| **rutaService.js** | Gestión de rutas, paradas, horarios, disponibilidad |
+| **reporteService.js** | Creación de reportes, integración con predictor ML |
+
+### Predictor ML Service (Python FastAPI)
+
+| Servicio | Responsabilidad |
+|----------|----------------|
+| **prediction_service.py** | Predicción de demoras, análisis de datos históricos |
+| **health_check** | Validación de estado del servicio |
+| **analytics** | Métricas y reportes del modelo |
+
+---
+
+## 👥 Roles y Permisos
+
+### 🔴 ADMIN
+**Permisos**: Control total del sistema
+- Ver dashboard administrativo completo
+- Gestionar conductores (crear, editar, desactivar)
+- Gestionar rutas (crear, modificar, asignar)
+- Visualizar reportes y analytics
+- Acceder a predicciones del sistema
+- Crear alertas y notificaciones
+
+**Acceso**: Web dashboard
+
+### 🟡 CONDUCTOR
+**Permisos**: Gestión de su ruta asignada
+- Iniciar/finalizar ruta
+- Enviar ubicación GPS en tiempo real
+- Ver próximas paradas
+- Reportar incidentes/retrasos
+- Ver estado actual de su viaje
+
+**Acceso**: Aplicación móvil
+
+### 🟢 CLIENTE/PASAJERO
+**Permisos**: Información de transporte
+- Buscar rutas disponibles
+- Ver horarios y paradas
+- Consultar ETA (tiempo estimado de llegada)
+- Recibir notificaciones de cambios
+- Ver ubicación de bus en tiempo real
+
+**Acceso**: Web pública
 
 ---
 
@@ -48,593 +138,197 @@ MyRuta es un sistema completo de monitoreo de transporte público que proporcion
 
 ```
 MyRuta/
-│
-├── 📄 README.md                          # Este archivo
-├── 📄 PROJECT_SUMMARY.md                 # Resumen completo del proyecto
-├── 📄 .gitignore                         # Patrones ignorados por Git
-├── 📄 docker-compose.yml                 # Servicios PostgreSQL + Redis
-│
-├── 📦 backend/                           # API REST + WebSocket (Node.js/Express)
-│   ├── 📄 package.json                   # Dependencias npm
-│   ├── 📄 .env.example                   # Variables de entorno
-│   ├── 📄 .gitignore
-│   ├── 📄 README.md                      # Documentación backend
-│   │
-│   ├── 📂 src/
-│   │   ├── 📄 index.js                   # Punto de entrada
-│   │   ├── 📄 server.js                  # Configuración Express + Socket.io
-│   │   │
-│   │   ├── 📂 socket/
-│   │   │   ├── 📄 socketConfig.js        # Configuración Socket.io
-│   │   │   └── 📂 handlers/
-│   │   │       ├── 📄 locationHandler.js # Manejo de GPS
-│   │   │       └── 📄 connectionHandler.js # Conexiones
-│   │   │
-│   │   ├── 📂 routes/                    # Rutas API
-│   │   │   ├── 📄 authRoutes.js          # Autenticación
-│   │   │   ├── 📄 conductorRoutes.js     # Gestión de conductores
-│   │   │   ├── 📄 clienteRoutes.js       # Endpoints de clientes
-│   │   │   ├── 📄 adminRoutes.js         # Panel administrativo
-│   │   │   └── 📄 rutaRoutes.js          # Gestión de rutas
-│   │   │
-│   │   ├── 📂 controllers/               # Lógica de controladores
-│   │   │   ├── 📄 authController.js
-│   │   │   ├── 📄 conductorController.js
-│   │   │   ├── 📄 clienteController.js
-│   │   │   ├── 📄 adminController.js
-│   │   │   └── 📄 rutaController.js
-│   │   │
-│   │   ├── 📂 services/                  # Servicios de negocio
-│   │   │   ├── 📄 authService.js         # Login, tokens JWT
-│   │   │   ├── 📄 conductorService.js    # CRUD conductores
-│   │   │   ├── 📄 clienteService.js      # Operaciones de clientes
-│   │   │   ├── 📄 rutaService.js         # Rutas y paradas
-│   │   │   ├── 📄 locationService.js     # Cálculos GPS, distancia
-│   │   │   └── 📄 reporteService.js      # Analytics e integración ML
-│   │   │
-│   │   ├── 📂 middlewares/               # Middleware Express
-│   │   │   ├── 📄 authMiddleware.js      # Verificación JWT
-│   │   │   ├── 📄 roleMiddleware.js      # Control de roles
-│   │   │   ├── 📄 errorHandler.js        # Manejo centralizado
-│   │   │   └── 📄 validationMiddleware.js # Validación de entrada
-│   │   │
-│   │   ├── 📂 models/
-│   │   │   └── 📄 prismaClient.js        # Singleton Prisma
-│   │   │
-│   │   ├── 📂 config/
-│   │   │   ├── 📄 database.js            # Configuración BD
-│   │   │   └── 📄 env.js                 # Variables de entorno
-│   │   │
-│   │   └── 📂 utils/
-│   │       ├── 📄 logger.js              # Logging con colores
-│   │       └── 📄 jwt.js                 # Operaciones con tokens
-│   │
-│   ├── 📂 prisma/
-│   │   └── 📄 schema.prisma              # Esquema BD (9 modelos)
-│   │
-│   └── 📂 tests/
-│       └── 📄 example.test.js            # Estructura de tests
-│
-├── 📦 web/                               # Frontend React/Vite
-│   ├── 📄 package.json                   # Dependencias npm
-│   ├── 📄 .env.example
-│   ├── 📄 .gitignore
-│   ├── 📄 README.md                      # Documentación web
-│   ├── 📄 index.html                     # Punto de entrada HTML
-│   ├── 📄 vite.config.js                 # Configuración Vite
-│   ├── 📄 tailwind.config.js             # Configuración Tailwind
-│   ├── 📄 postcss.config.js
-│   │
-│   └── 📂 src/
-│       ├── 📄 main.jsx                   # Entrada React
-│       ├── 📄 App.jsx                    # Router principal
-│       │
-│       ├── 📂 components/                # Componentes reutilizables
-│       │   ├── 📂 Layout/
-│       │   │   ├── 📄 Header.jsx
-│       │   │   ├── 📄 Navbar.jsx
-│       │   │   └── 📄 Footer.jsx
-│       │   ├── 📂 Common/
-│       │   │   ├── 📄 Button.jsx
-│       │   │   ├── 📄 Card.jsx
-│       │   │   └── 📄 LoadingSpinner.jsx
-│       │   └── 📂 Maps/
-│       │       └── 📄 LiveMap.jsx
-│       │
-│       ├── 📂 pages/                     # Páginas por rol
-│       │   ├── 📂 Admin/
-│       │   │   ├── 📄 Dashboard.jsx
-│       │   │   ├── 📄 LiveMap.jsx
-│       │   │   ├── 📄 Reportes.jsx
-│       │   │   ├── 📄 GestionRutas.jsx
-│       │   │   └── 📄 GestionConductores.jsx
-│       │   ├── 📂 Cliente/
-│       │   │   ├── 📄 Home.jsx
-│       │   │   ├── 📄 ConsultaRutas.jsx
-│       │   │   └── 📄 TiemposEstimados.jsx
-│       │   └── 📂 Public/
-│       │       ├── 📄 LoginPage.jsx
-│       │       └── 📄 NotFoundPage.jsx
-│       │
-│       ├── 📂 hooks/                     # Custom hooks
-│       │   ├── 📄 useAuth.js             # Estado autenticación
-│       │   ├── 📄 useSocket.js           # Socket.io
-│       │   └── 📄 useLocation.js         # Geolocalización
-│       │
-│       ├── 📂 contexts/                  # Contextos (state management)
-│       │   ├── 📄 AuthContext.jsx        # Autenticación global
-│       │   └── 📄 LocationContext.jsx    # Ubicaciones en tiempo real
-│       │
-│       ├── 📂 services/                  # Servicios API
-│       │   ├── 📄 api.js                 # Axios + interceptores
-│       │   ├── 📄 authService.js
-│       │   ├── 📄 rutaService.js
-│       │   └── 📄 socketService.js
-│       │
-│       ├── 📂 styles/
-│       │   ├── 📄 globals.css            # Estilos Tailwind
-│       │   └── 📄 index.css              # Animaciones
-│       │
-│       └── 📂 utils/
-│           ├── 📄 helpers.js             # Funciones útiles
-│           └── 📄 constants.js           # Constantes/endpoints
-│
-├── 📦 mobile/                            # App Flutter
-│   ├── 📄 pubspec.yaml                   # Dependencias Flutter
-│   ├── 📄 analysis_options.yaml          # Linter rules
-│   ├── 📄 .gitignore
-│   ├── 📄 README.md                      # Documentación móvil
-│   │
-│   └── 📂 lib/
-│       ├── 📄 main.dart                  # Punto de entrada
-│       │
-│       ├── 📂 config/
-│       │   ├── 📄 app_config.dart        # Variables de entorno
-│       │   └── 📄 socket_config.dart     # Configuración Socket.io
-│       │
-│       ├── 📂 models/                    # Modelos de datos
-│       │   ├── 📄 user_model.dart
-│       │   ├── 📄 route_model.dart
-│       │   └── 📄 location_model.dart
-│       │
-│       ├── 📂 services/                  # Servicios de API
-│       │   ├── 📄 api_service.dart       # Cliente HTTP
-│       │   ├── 📄 auth_service.dart      # Autenticación
-│       │   ├── 📄 location_service.dart  # GPS y geolocalización
-│       │   ├── 📄 socket_service.dart    # Socket.io
-│       │   └── 📄 map_service.dart       # Helpers de mapas
-│       │
-│       ├── 📂 providers/                 # State management (Provider)
-│       │   ├── 📄 auth_provider.dart     # Estado de autenticación
-│       │   ├── 📄 location_provider.dart # Seguimiento de posición
-│       │   └── 📄 route_provider.dart    # Gestión de rutas
-│       │
-│       ├── 📂 screens/                   # Pantallas de la app
-│       │   ├── 📂 auth/
-│       │   │   └── 📄 login_screen.dart
-│       │   ├── 📂 conductor/
-│       │   │   ├── 📄 home_conductor_screen.dart
-│       │   │   ├── 📄 tracking_screen.dart
-│       │   │   └── 📄 reports_screen.dart
-│       │   ├── 📂 cliente/
-│       │   │   ├── 📄 home_cliente_screen.dart
-│       │   │   ├── 📄 route_search_screen.dart
-│       │   │   └── 📄 route_details_screen.dart
-│       │   └── 📂 common/
-│       │       └── 📄 splash_screen.dart
-│       │
-│       ├── 📂 widgets/                   # Widgets reutilizables
-│       │   ├── 📄 custom_app_bar.dart
-│       │   ├── 📄 maps_widget.dart
-│       │   ├── 📄 loading_widget.dart
-│       │   └── 📄 custom_button.dart
-│       │
-│       └── 📂 utils/                     # Utilidades
-│           ├── 📄 theme.dart             # Tema Material Design
-│           ├── 📄 constants.dart         # Constantes de la app
-│           ├── 📄 exceptions.dart        # Excepciones personalizadas
-│           ├── 📄 extensions.dart        # Dart extensions
-│           ├── 📄 helpers.dart           # Funciones auxiliares
-│           └── 📄 logger.dart            # Sistema de logging
-│
-└── 📦 predictor/                         # Servicio ML (Python/FastAPI)
-    ├── 📄 main.py                        # Punto de entrada FastAPI
-    ├── 📄 requirements.txt                # Dependencias Python
-    ├── 📄 .env.example
-    ├── 📄 .gitignore
-    ├── 📄 README.md                      # Documentación predictor
-    │
-    ├── 📂 app/
-    │   ├── 📄 __init__.py
-    │   │
-    │   ├── 📂 api/                       # Rutas de la API
-    │   │   ├── 📄 __init__.py
-    │   │   ├── 📄 health.py              # Health checks
-    │   │   ├── 📄 predictions.py         # Predicciones
-    │   │   └── 📄 analytics.py           # Analytics
-    │   │
-    │   ├── 📂 config/                    # Configuración
-    │   │   ├── 📄 __init__.py
-    │   │   └── 📄 settings.py            # Pydantic settings
-    │   │
-    │   ├── 📂 models/                    # Esquemas Pydantic
-    │   │   ├── 📄 __init__.py
-    │   │   └── 📄 schemas.py             # Request/response models
-    │   │
-    │   ├── 📂 services/                  # Servicios de negocio
-    │   │   ├── 📄 __init__.py
-    │   │   └── 📄 prediction_service.py  # Lógica de predicción
-    │   │
-    │   └── 📂 utils/                     # Utilidades
-    │       ├── 📄 __init__.py
-    │       └── 📄 logger.py              # Logging
-    │
-    └── 📂 tests/
-        ├── 📄 __init__.py
-        └── 📄 test_prediction.py         # Suite de tests
+├── backend/              # API Express + Socket.io (Node.js)
+├── web/                  # Dashboard React
+├── mobile/               # App Flutter
+├── predictor/            # Servicio ML FastAPI (Python)
+├── README.md             # Este archivo
+└── docker-compose.yml    # Infraestructura (opcional)
 ```
 
 ---
 
-## 🚀 Instalación y Configuración
+## 🚀 Inicio Rápido
 
 ### Requisitos Previos
+- **Node.js 18+** (Backend y Web)
+- **Python 3.10+** (Predictor)
+- **Flutter 3.10+** (Mobile)
+- **Firebase**: Cuenta con credenciales configuradas
 
-- **Node.js 18+** (Backend y Frontend)
-- **Flutter 3.10+** (Aplicación Móvil)
-- **Python 3.10+** (Servicio Predictor)
-- **PostgreSQL 15** (o Docker)
-- **Redis 7** (o Docker)
-- **Git**
-
-### Instalación de Infraestructura (Docker)
-
+### Backend (Puerto 3000)
 ```bash
-# En la carpeta raíz del proyecto
-docker-compose up -d
-
-# Verificar servicios
-docker-compose ps
-```
-
-Esto levantará:
-- PostgreSQL en `localhost:5432`
-- Redis en `localhost:6379`
-
----
-
-## 🏃 Ejecución Local
-
-### ⚡ Inicio Rápido (Recomendado)
-
-Ejecuta los siguientes comandos en **terminales separadas**:
-
-**Terminal 1 - Backend**:
-```powershell
 cd backend
 npm install
-node ".\src\index.js"
+node src/index.js
 ```
 
-**Terminal 2 - Predictor**:
-```powershell
-cd predictor
-py -m pip install -q -r requirements.txt
-py ".\main.py"
-```
+**Logs**: `🚀 Backend running on port 3000`
 
-**Terminal 3 - Frontend (Opcional)**:
-```powershell
+### Frontend Web (Puerto 5173)
+```bash
 cd web
 npm install
 npm run dev
 ```
 
----
+**Logs**: `Local: http://localhost:5173`
 
-### 1️⃣ Backend Express.js (Puerto 3000)
-
-#### Instalación
-```powershell
-cd backend
-npm install
-```
-
-#### Ejecución
-```powershell
-# Opción 1: Ejecutar directamente
-node ".\src\index.js"
-
-# Opción 2: Con npm (requiere script configurado)
-npm run dev
-```
-
-#### Verificación
-```powershell
-# Test de conectividad
-Invoke-WebRequest -Uri "http://localhost:3000" -UseBasicParsing
-```
-
-**Endpoint**: `http://localhost:3000`  
-**Logs esperados**: `[INFO] 🚀 MyRuta Backend running on port 3000`
-
----
-
-### 2️⃣ Frontend Web (Puerto 5173)
-
-#### Instalación
-```powershell
-cd web
-npm install
-```
-
-#### Ejecución
-```powershell
-# Desarrollo con recarga en vivo (HMR)
-npm run dev
-
-# Build para producción
-npm run build
-```
-
-#### Verificación
-- Abre: `http://localhost:5173`
-- Debe mostrar login de MyRuta
-
-**Características**:
-- Hot Module Replacement (cambios inmediatos)
-- Vite para compilación rápida
-- Tailwind CSS integrado
-
----
-
-### 3️⃣ Servicio Predictor ML (Puerto 8001)
-
-#### Instalación (Primera vez)
-
-```powershell
+### Predictor ML (Puerto 8001)
+```bash
 cd predictor
-
-# Verificar Python disponible
-py --version  # Debe ser Python 3.10+
-
-# Instalar dependencias
-py -m pip install --upgrade pip -q
-py -m pip install -q -r requirements.txt
+pip install -r requirements.txt
+python main.py
 ```
 
-#### Ejecución
-```powershell
-# Desde el directorio predictor
-py ".\main.py"
-```
+**Acceso Swagger**: http://localhost:8001/api/docs
 
-#### Verificación
-```powershell
-# Test health check
-Invoke-WebRequest -Uri "http://localhost:8001/api/health/" -UseBasicParsing | `
-  Select-Object -ExpandProperty Content | ConvertFrom-Json | Format-Table
-```
-
-**Respuesta esperada**:
-```
-status   database model_loaded
-------   -------- ------------
-healthy     True         True
-```
-
-#### Acceso a APIs
-- **Docs Interactivos**: http://localhost:8001/api/docs
-- **Health Check**: http://localhost:8001/api/health/
-- **Predicciones**: POST http://localhost:8001/api/predictions/predict
-
----
-
-### 4️⃣ Aplicación Móvil Flutter (Opcional)
-
-#### Requisitos
-- Flutter 3.10+ instalado
-- Android Studio o Xcode
-
-#### Instalación
-```powershell
+### Mobile App
+```bash
 cd mobile
-
-# Obtener dependencias
 flutter pub get
-```
-
-#### Ejecución
-```powershell
-# Ver dispositivos disponibles
-flutter devices
-
-# Ejecutar en emulador/dispositivo
 flutter run
-
-# Build APK (Android)
-flutter build apk
-
-# Build iOS
-flutter build ios
 ```
 
 ---
 
-## ✅ Verificación del Sistema Completo
+## 🔌 APIs Principales
 
-Ejecuta este script para verificar que todo está corriendo:
+### REST API Base: `http://localhost:3000/api`
 
-```powershell
-Write-Host "=== VERIFICACIÓN DE SERVICIOS MYRUTA ===" -ForegroundColor Cyan
+#### Autenticación
+```
+POST   /auth/register              # Crear cuenta
+POST   /auth/login                 # Iniciar sesión
+POST   /auth/refresh               # Renovar token
+```
 
-# Test Backend
-Write-Host "`n1. Backend (Puerto 3000)..."
-try {
-    $backend = Invoke-WebRequest -Uri "http://localhost:3000" -UseBasicParsing -ErrorAction Stop
-    Write-Host "   [OK] Backend respondiendo" -ForegroundColor Green
-} catch {
-    Write-Host "   [ERROR] Backend no accesible" -ForegroundColor Red
+#### Rutas
+```
+GET    /rutas                      # Listar todas las rutas
+GET    /rutas/:id                  # Detalle de una ruta
+POST   /rutas                      # Crear ruta (admin)
+PUT    /rutas/:id                  # Actualizar ruta (admin)
+```
+
+#### Conductores
+```
+GET    /conductores                # Listar conductores (admin)
+GET    /conductores/:id            # Detalle conductor
+POST   /conductores                # Registrar conductor (admin)
+GET    /conductores/:id/ubicacion  # Ubicación actual conductor
+```
+
+#### Reportes
+```
+GET    /reportes                   # Listar incidentes
+POST   /reportes                   # Crear reporte de incidente
+GET    /reportes/:id               # Detalle de reporte
+```
+
+#### Predicciones
+```
+POST   /predicciones               # Solicitar predicción de demora
+GET    /predicciones/historial     # Histórico de predicciones
+```
+
+### WebSocket Events (Socket.io)
+
+**Servidor → Cliente**:
+```
+location:update          # Nueva ubicación de conductor
+route:started            # Ruta iniciada
+route:completed          # Ruta completada
+incident:reported        # Nuevo incidente reportado
+conductor:online         # Conductor conectado
+conductor:offline        # Conductor desconectado
+```
+
+**Cliente → Servidor**:
+```
+location:send            # Enviar ubicación GPS
+incident:create          # Crear incidente
+message:send             # Enviar mensaje
+```
+
+### Predictor ML API: `http://localhost:8001/api`
+
+```
+POST   /predictions/predict        # Predicción única
+POST   /predictions/batch          # Predicciones en lote
+GET    /analytics/metrics          # Métricas del modelo
+GET    /health/                    # Estado del servicio
+```
+
+---
+
+## 🔐 Autenticación
+
+- **JWT Tokens**: Acceso a APIs REST
+- **Expiry**: 24 horas (renovable)
+- **Refresh Tokens**: Para sesiones prolongadas
+- **Firebase Auth**: Respaldo de seguridad
+
+**Header**:
+```
+Authorization: Bearer <token_jwt>
+```
+
+---
+
+## 📊 Estructura de Datos
+
+### Usuario Base
+```json
+{
+  "id": "uid_firebase",
+  "email": "user@example.com",
+  "firstName": "Juan",
+  "lastName": "Pérez",
+  "role": "CLIENTE|CONDUCTOR|ADMIN",
+  "createdAt": "2026-05-19T10:30:00Z"
 }
+```
 
-# Test Predictor
-Write-Host "`n2. Predictor (Puerto 8001)..."
-try {
-    $predictor = Invoke-WebRequest -Uri "http://localhost:8001/api/health/" -UseBasicParsing -ErrorAction Stop
-    $health = $predictor.Content | ConvertFrom-Json
-    Write-Host "   [OK] Predictor: $($health.status)" -ForegroundColor Green
-} catch {
-    Write-Host "   [ERROR] Predictor no accesible" -ForegroundColor Red
+### Ruta
+```json
+{
+  "id": "ruta_001",
+  "nombre": "Línea 1",
+  "codigo": "L1",
+  "origen": "Terminal Central",
+  "destino": "Aeropuerto",
+  "paradas": ["Parada 1", "Parada 2"],
+  "activa": true
 }
+```
 
-# Test Frontend
-Write-Host "`n3. Frontend (Puerto 5173)..."
-try {
-    $frontend = Invoke-WebRequest -Uri "http://localhost:5173" -UseBasicParsing -ErrorAction Stop
-    Write-Host "   [OK] Frontend respondiendo" -ForegroundColor Green
-} catch {
-    Write-Host "   [PENDIENTE] Frontend - ejecuta 'npm run dev' en web/" -ForegroundColor Yellow
+### Ubicación (GPS)
+```json
+{
+  "id": "loc_001",
+  "conductorId": "cond_001",
+  "latitud": 10.3851,
+  "longitud": -75.4794,
+  "velocidad": 45.2,
+  "timestamp": "2026-05-19T14:25:00Z"
 }
-
-Write-Host "`n=== RESUMEN ===" -ForegroundColor Cyan
-Write-Host "Todos los servicios disponibles en:" -ForegroundColor Green
-Write-Host "  Backend:   http://localhost:3000"
-Write-Host "  Frontend:  http://localhost:5173"
-Write-Host "  Predictor: http://localhost:8001/api/docs"
 ```
 
 ---
 
-## 📚 Documentación de Componentes
+## 📚 Documentación Detallada
 
-Cada componente cuenta con documentación completa:
+Cada componente tiene su propio README:
 
-### Backend
-📖 [Backend README](./backend/README.md)
-- Estructura de rutas y servicios
-- Esquema Prisma ORM
-- Configuración Socket.io
-- Autenticación JWT
-
-### Frontend Web
-📖 [Frontend README](./web/README.md)
-- Estructura de componentes
-- Routing y protecciones
-- Integración Google Maps
-- State management con Context API
-
-### Aplicación Móvil
-📖 [Mobile README](./mobile/README.md)
-- Configuración Flutter
-- Modelos y servicios
-- Pantallas por rol
-- GPS y Socket.io
-
-### Servicio Predictor
-📖 [Predictor README](./predictor/README.md)
-- Endpoints de predicción
-- Machine Learning
-- Analytics y métricas
-- Validación de entrada
-
----
-
-## 🔌 Integración y APIs
-
-### Comunicación Backend ↔ Frontend/Mobile
-
-**REST API Base**: `http://localhost:3000/api`
-
-Endpoints principales:
-```
-POST   /auth/login              # Autenticación
-POST   /auth/register           # Registro
-GET    /rutas                   # Listar rutas
-GET    /rutas/:id               # Detalle de ruta
-GET    /conductores/:id/ubicacion # GPS conductor
-POST   /reportes                # Reportar incidente
-```
-
-### WebSocket (Socket.io)
-
-**Conexión**: `http://localhost:3000`
-
-Eventos principales:
-```
-location:update      # GPS del conductor
-route:started        # Ruta iniciada
-route:completed      # Ruta completada
-incident:reported    # Incidente reportado
-conductor:status     # Estados del conductor
-```
-
-### Machine Learning (Predictor)
-
-**Base**: `http://localhost:8001/api`
-
-```
-POST   /predictions/predict     # Predicción única
-POST   /predictions/batch       # Predicciones en lote
-GET    /analytics/metrics       # Métricas del modelo
-GET    /health/                 # Estado del servicio
-```
-
----
-
-## 👥 Roles y Control de Acceso
-
-Tres roles principales con permisos diferenciados:
-
-### 🔴 ADMIN
-- Acceso a dashboard administrativo
-- Gestión de conductores y rutas
-- Visualización de reportes
-- Análisis de demoras
-- Control de usuarios
-
-**Rutas Accesibles**:
-- `/admin/dashboard`
-- `/admin/conductores`
-- `/admin/rutas`
-- `/admin/reportes`
-
-### 🟡 CONDUCTOR
-- Iniciar/finalizar ruta
-- Enviar ubicación GPS
-- Reportar incidentes
-- Ver próximas paradas
-
-**Pantallas Móviles**:
-- HomeCondutor (estado actual)
-- TrackingScreen (mapa)
-- ReportsScreen (incidentes)
-
-### 🟢 CLIENTE
-- Buscar rutas disponibles
-- Ver horarios y ETA
-- Recibir notificaciones
-- Contactar conductor
-
-**Rutas Web**:
-- `/cliente/rutas`
-- `/cliente/horarios`
-- `/cliente/mapa`
-
----
-
-## 🔐 Autenticación y Seguridad
-
-- **JWT Tokens**: Autenticación stateless
-- **Refresh Tokens**: Renovación de sesiones
-- **Secure Storage**: Token almacenado de forma segura en móvil
-- **CORS Configuration**: Orígenes permitidos configurables
-- **Input Validation**: Validación Pydantic en todas las APIs
+- 📖 [Backend](./backend/README.md)
+- 📖 [Frontend](./web/README.md)
+- 📖 [Mobile](./mobile/README.md)
+- 📖 [Predictor](./predictor/README.md)
 
 ---
 
 ## 🧪 Testing
-
-Cada componente incluye estructura para tests:
 
 ```bash
 # Backend
@@ -643,138 +337,116 @@ cd backend && npm test
 # Frontend
 cd web && npm test
 
-# Flutter
-cd mobile && flutter test
-
 # Predictor
 cd predictor && pytest
 ```
 
 ---
 
-## 📊 Base de Datos
+## 🌍 Configuración de Entorno
 
-**Modelos Prisma** (9 modelos):
-- `User` (usuario base)
-- `Conductor` (conductores)
-- `Cliente` (pasajeros)
-- `Admin` (administradores)
-- `Ruta` (rutas disponibles)
-- `Parada` (paradas de ruta)
-- `Location` (historial de GPS)
-- `Trip` (viajes realizados)
-- `Incident` (reportes de incidentes)
-
-Ver esquema completo en: `backend/prisma/schema.prisma`
-
----
-
-## 🌍 Variables de Entorno
-
-Cada componente requiere configuración específica:
+Cada componente requiere un archivo `.env`:
 
 ```bash
 # Backend (.env)
-DATABASE_URL=postgresql://...
-REDIS_URL=redis://...
-JWT_SECRET=your_secret
+DATABASE_URL=firebase://...
+JWT_SECRET=tu_secreto_jwt
 PORT=3000
+SOCKET_PORT=3000
+PREDICTOR_SERVICE_URL=http://localhost:8001
 
 # Frontend (.env.local)
 VITE_API_URL=http://localhost:3000
 
-# Mobile (lib/config/app_config.dart)
-API_BASE_URL = 'http://localhost:3000/api'
-SOCKET_URL = 'http://localhost:3000'
-
 # Predictor (.env)
-DATABASE_URL=postgresql://...
 BACKEND_URL=http://localhost:3000
 PORT=8001
 ```
 
 ---
 
-## 📈 Roadmap
+## 🐛 Solución de Problemas
 
-### Fase 1: Scaffolding ✅
-- [x] Estructura de carpetas
-- [x] Archivos de configuración
-- [x] Modelos y esquemas
-- [x] Rutas y endpoints base
-
-### Fase 2: Implementación
-- [ ] Lógica de negocio completa
-- [ ] Autenticación funcional
-- [ ] Integración base de datos
-- [ ] Socket.io en tiempo real
-
-### Fase 3: Frontend
-- [ ] Componentes React finalizados
-- [ ] Vistas completas por rol
-- [ ] Mapas interactivos
-- [ ] Notificaciones en tiempo real
-
-### Fase 4: Mobile
-- [ ] GPS y tracking automático
-- [ ] Interfaz pulida
-- [ ] Pruebas en dispositivos
-- [ ] Publicación en stores
-
-### Fase 5: ML
-- [ ] Modelo de predicción entrenado
-- [ ] Endpoint de predicciones
-- [ ] Analytics dashboard
-- [ ] Explicabilidad de modelos
-
----
-
-## 🐛 Troubleshooting
-
-### Puerto ya está en uso
+### Puerto ya en uso
 ```bash
 # Cambiar en .env
-PORT=3001  # o el puerto que prefieras
+PORT=3001
 ```
 
-### Error de conexión a BD
+### Error de conexión Firebase
 ```bash
-# Verificar docker-compose
-docker-compose logs postgres
+# Verificar firebase-service-account.json existe
+ls backend/firebase-service-account.json
 
-# O instalar PostgreSQL localmente
+# Validar credenciales
+cat backend/.env
 ```
 
-### Dependencias desactualizadas
+### Predictor no responde
 ```bash
-# Backend
-cd backend && npm update
+# Verificar que está corriendo
+curl http://localhost:8001/api/health/
 
-# Frontend
-cd web && npm update
-
-# Predictor
-cd predictor && pip install --upgrade -r requirements.txt
+# Revisar logs
+python predictor/main.py
 ```
 
 ---
 
-## 📞 Soporte
+## 📈 Roadmap
 
-Para consultas o problemas:
+| Fase | Estado | Tareas |
+|------|--------|--------|
+| **1: Setup** | ✅ Completo | Estructura, config, scaffolding |
+| **2: Core** | 🔄 En Progreso | APIs, autenticación, BD |
+| **3: Features** | ⏳ Pendiente | Frontend completo, Mobile, ML |
+| **4: Deploy** | ⏳ Pendiente | Testing, Docker, producción |
 
-1. Revisa el `README.md` de cada componente
-2. Consulta `PROJECT_SUMMARY.md` para arquitectura completa
-3. Revisa los comentarios en el código fuente
-4. Abre un issue en el repositorio
+---
+
+## 📞 Contacto y Soporte
+
+Para preguntas o issues:
+1. Revisa el README de cada carpeta
+2. Consulta `PROJECT_SUMMARY.md`
+3. Abre un issue en el repositorio
 
 ---
 
 ## 📝 Licencia
 
-Propietario - Equipo MyRuta
+**Propietario** - Equipo MyRuta
 
 ---
 
-**Última Actualización**: Marzo 2026  
-**Versión**: 1.0.0
+**Última Actualización**: Mayo 2026 | **Versión**: 1.0.0
+python main.py
+```
+
+### Mobile
+```bash
+cd mobile
+flutter pub get
+flutter run
+```
+
+---
+
+## 📁 Carpetas
+
+| Carpeta | Contenido |
+|---------|-----------|
+| **backend/** | API Express + Socket.io |
+| **web/** | Dashboard React |
+| **mobile/** | App Flutter |
+| **predictor/** | Servicio IA Python |
+
+---
+
+## 📚 Más Información
+
+Consulta el `README.md` dentro de cada carpeta para detalles específicos.
+
+---
+
+**Última Actualización**: Mayo 2026
