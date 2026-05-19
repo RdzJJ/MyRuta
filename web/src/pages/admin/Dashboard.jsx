@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import LiveMapPage from '../../pages/admin/LiveMap'           // ← INTEGRADO
+import LiveMapPage from '../../pages/admin/LiveMap'
 import HistorialRecorridos from '../../components/admin/HistorialRecorridos'
-import { getBuses, getRutas } from '../../services/firestoreService'
+import { getBuses, getRutas, getConductores } from '../../services/firestoreService'
 
 export default function Dashboard() {
   const [buses, setBuses] = useState([])
@@ -14,18 +14,18 @@ export default function Dashboard() {
     incidencias: 5
   })
 
-  // Load stats
   useEffect(() => {
     const loadStats = async () => {
-      const [buses, rutas] = await Promise.all([getBuses(), getRutas()])
-      const rutasActivas = rutas.filter((r) => r.status === 'active').length
-      const conductoresSet = new Set(buses.map((b) => b.conductorId))
+      const [buses, rutas, conductores] = await Promise.all([getBuses(), getRutas(), getConductores()])
+
+      const rutasActivas = rutas.filter(r => r.status === 'active').length
+
       setBuses(buses)
 
       setStats({
         rutasActivas,
-        conductores: conductoresSet.size,
-        viajesHoy: buses.length * 12, // Mock: 12 viajes por bus
+        conductores: conductores.filter(c => c.activo !== false).length,
+        viajesHoy: buses.length * 12,
         incidencias: 5
       })
     }
@@ -34,11 +34,11 @@ export default function Dashboard() {
   }, [])
 
   const statsCards = [
-    { label: 'Rutas Activas', value: stats.rutasActivas, icon: '🛣️' },
-    { label: 'Conductores', value: stats.conductores, icon: '👨‍✈️' },
-    { label: 'Viajes Hoy', value: stats.viajesHoy, icon: '🚌' },
-    { label: 'Buses Activos', value: buses.length, icon: '🚌' },
-    { label: 'Incidencias', value: stats.incidencias, icon: '⚠️' },
+    { label: 'Rutas Activas', value: stats.rutasActivas },
+    { label: 'Conductores', value: stats.conductores },
+    { label: 'Viajes Hoy', value: stats.viajesHoy },
+    { label: 'Buses Activos', value: buses.length },
+    { label: 'Incidencias', value: stats.incidencias },
   ]
 
   return (
@@ -56,12 +56,7 @@ export default function Dashboard() {
           <div className="h-1 w-24 bg-gradient-to-r from-neon-500 to-transparent" />
         </div>
 
-        {/* ── 1. MAPA EN VIVO (primero) ─────────────────────────────────────── */}
-        {/*
-          LiveMapPage tiene su propio layout (min-h-screen + padding).
-          Lo envolvemos en un contenedor que anula esos estilos para que
-          quede embebido limpiamente dentro del dashboard.
-        */}
+        {/* ── 1. MAPA EN VIVO ───────────────────────────────────────────────── */}
         <div className="mb-8 [&>div]:min-h-0 [&>div]:p-0 [&>div>main]:px-0 [&>div>main]:py-0 [&>div>main]:max-w-none">
           <LiveMapPage />
         </div>

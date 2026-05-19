@@ -3,10 +3,10 @@
  */
 
 const reports = [
-  { icon: '⏱️', title: 'Reporte de Puntualidad', desc: 'Análisis de puntualidad por ruta y conductor' },
-  { icon: '⚠️', title: 'Reporte de Incidencias', desc: 'Listado de problemas e incidentes reportados' },
-  { icon: '📊', title: 'Reporte de Desempeño', desc: 'Evaluación del desempeño de conductores' },
-  { icon: '🤖', title: 'Predicciones de Delays', desc: 'Predicciones de delays basadas en ML' },
+  { title: 'Reporte de Puntualidad', desc: 'Análisis de puntualidad por ruta y conductor' },
+  { title: 'Reporte de Incidencias', desc: 'Listado de problemas e incidentes reportados' },
+  { title: 'Reporte de Desempeño', desc: 'Evaluación del desempeño de conductores' },
+  { title: 'Predicciones de Delays', desc: 'Predicciones de delays basadas en ML' },
 ]
 
 export default function Reportes() {
@@ -16,7 +16,7 @@ export default function Reportes() {
         {/* Header */}
         <div>
           <h1 className="text-5xl font-bold text-neon-500 mb-2" style={{ textShadow: '0 0 20px rgba(0, 255, 65, 0.8)' }}>
-            📋 Reportes y Análisis
+            Reportes y Análisis
           </h1>
           <div className="h-1 w-24 bg-gradient-to-r from-neon-500 to-transparent mb-8"></div>
         </div>
@@ -42,7 +42,7 @@ export default function Reportes() {
         {/* Analytics Section */}
         <div className="bg-dark-800 border-2 border-neon-500 rounded-xl p-8" style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.2)' }}>
           <h2 className="text-2xl font-bold text-neon-500 mb-4" style={{ textShadow: '0 0 10px rgba(0, 255, 65, 0.6)' }}>
-            📈 Análisis General del Sistema
+            Análisis General del Sistema
           </h2>
           <div className="h-1 w-12 bg-gradient-to-r from-neon-500 to-transparent mb-6"></div>
 
