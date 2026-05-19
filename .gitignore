@@ -5,6 +5,7 @@
 .env.prod.local
 *.env.local
 web/.env.example
+.venv
 
 # Node modules
 node_modules/
