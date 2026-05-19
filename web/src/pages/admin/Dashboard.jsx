@@ -1,12 +1,3 @@
-/**
- * MyRuta Web - Admin Dashboard Page
- * 
- * Features:
- * - Real-time map with buses and routes
- * - Travel history with filtering
- * - System statistics and quick actions
- */
-
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AdminRealtimeMap from '../../components/Maps/AdminRealtimeMap'
@@ -93,7 +84,7 @@ export default function Dashboard() {
             className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-4 px-6 rounded-xl hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
             style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.4)' }}
           >
-            Crear Nueva Ruta
+            Gestionar Rutas
           </button>
           <button
             onClick={() => navigate('/admin/conductores')}
