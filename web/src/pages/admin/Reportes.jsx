@@ -63,12 +63,6 @@ export default function Reportes() {
               <p className="text-xs text-green-400 mt-2">↑ 0.3 puntos vs mes anterior</p>
             </div>
           </div>
-
-          <div className="bg-dark-700 border-l-4 border-neon-500 p-4 rounded" style={{ boxShadow: '0 0 10px rgba(0, 255, 65, 0.1)' }}>
-            <p className="text-neon-500">
-              ✓ Los gráficos detallados se mostrarán cuando el backend de analytics esté implementado.
-            </p>
-          </div>
         </div>
       </main>
     </div>

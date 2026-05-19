@@ -1,16 +1,3 @@
-/**
- * MyRuta Web - Main App Component
- * 
- * Responsibilities:
- * - Set up routing for different roles
- * - Initialize context providers
- * - Handle authentication state
- * 
- * ROUTING STRATEGY:
- * - Public Routes: Consultar rutas, horarios (sin login)
- * - Protected Routes: Admin dashboard (con login + ADMIN role)
- */
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { LocationProvider } from './contexts/LocationContext'
@@ -38,7 +25,7 @@ function App() {
         <LocationProvider>
           <div className="min-h-screen bg-dark-900 text-white flex flex-col overflow-x-hidden">
             {/* Grid background effect */}
-            <div className="fixed inset-0 opacity-5 pointer-events-none" 
+            <div className="fixed inset-0 opacity-5 pointer-events-none"
               style={{
                 backgroundImage: 'linear-gradient(0deg, transparent 24%, rgba(0, 255, 65, 0.05) 25%, rgba(0, 255, 65, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 65, 0.05) 75%, rgba(0, 255, 65, 0.05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 255, 65, 0.05) 25%, rgba(0, 255, 65, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 65, 0.05) 75%, rgba(0, 255, 65, 0.05) 76%, transparent 77%, transparent)',
                 backgroundSize: '50px 50px'
@@ -47,14 +34,14 @@ function App() {
 
             {/* Navigation Bar - appears on all pages */}
             <Navbar />
-            
+
             {/* Main Content Area */}
             <main className="flex-1 container mx-auto px-4 py-6 relative z-10">
               <Routes>
                 {/* ==================== PUBLIC ROUTES ==================== */}
                 {/* Default: Show available routes without login */}
                 <Route path="/" element={<ClienteConsultaRutas />} />
-                
+
                 {/* Public client pages */}
                 <Route path="/cliente/home" element={<ClienteHome />} />
                 <Route path="/cliente/rutas" element={<ClienteConsultaRutas />} />
@@ -65,25 +52,49 @@ function App() {
 
                 {/* ==================== PROTECTED ROUTES ==================== */}
                 {/* Admin Routes - Require ADMIN role */}
-                <Route 
-                  path="/admin/dashboard" 
-                  element={<ProtectedRoute element={<AdminDashboard />} requiredRoles={['ADMIN']} />} 
+                <Route
+                  path="/admin/dashboard"
+                  element={
+                    <ProtectedRoute adminOnly>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  }
                 />
-                <Route 
-                  path="/admin/mapa-vivo" 
-                  element={<ProtectedRoute element={<AdminLiveMap />} requiredRoles={['ADMIN']} />} 
+
+                <Route
+                  path="/admin/mapa-vivo"
+                  element={
+                    <ProtectedRoute adminOnly>
+                      <AdminLiveMap />
+                    </ProtectedRoute>
+                  }
                 />
-                <Route 
-                  path="/admin/reportes" 
-                  element={<ProtectedRoute element={<AdminReportes />} requiredRoles={['ADMIN']} />} 
+
+                <Route
+                  path="/admin/reportes"
+                  element={
+                    <ProtectedRoute adminOnly>
+                      <AdminReportes />
+                    </ProtectedRoute>
+                  }
                 />
-                <Route 
-                  path="/admin/rutas" 
-                  element={<ProtectedRoute element={<AdminRutas />} requiredRoles={['ADMIN']} />} 
+
+                <Route
+                  path="/admin/rutas"
+                  element={
+                    <ProtectedRoute adminOnly>
+                      <AdminRutas />
+                    </ProtectedRoute>
+                  }
                 />
-                <Route 
-                  path="/admin/conductores" 
-                  element={<ProtectedRoute element={<AdminConductores />} requiredRoles={['ADMIN']} />} 
+
+                <Route
+                  path="/admin/conductores"
+                  element={
+                    <ProtectedRoute adminOnly>
+                      <AdminConductores />
+                    </ProtectedRoute>
+                  }
                 />
 
                 {/* 404 Not Found */}

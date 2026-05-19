@@ -1,21 +1,7 @@
-/**
- * MyRuta Web - ETA Service
- * 
- * Integrates with:
- * - Google Routes API for real-time ETAs
- * - Predictor backend (if available)
- * - Firestore historical data
- * 
- * Features:
- * - Calculate ETA using current traffic
- * - Predict arrival time for all buses
- * - Update ETAs every 60 seconds
- * - Fallback to historical averages
- */
-
 import axios from 'axios'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+const PREDICTOR_BASE_URL = import.meta.env.VITE_PREDICTOR_URL || 'http://localhost:8001/api'
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
 /**
@@ -67,14 +53,15 @@ export async function calculateETAGoogle(busLocation, waypoints) {
             }
           }
         },
+        travelMode: 'DRIVE',
         routingPreference: 'TRAFFIC_AWARE',
-        departureTime: new Date().toISOString(),
         computeAlternativeRoutes: false
       },
       {
         headers: {
           'Content-Type': 'application/json',
-          'X-Goog-Api-Key': GOOGLE_MAPS_API_KEY
+          'X-Goog-Api-Key': GOOGLE_MAPS_API_KEY,
+          'X-Goog-FieldMask': 'routes.legs.duration,routes.legs.distanceMeters'
         }
       }
     )
@@ -87,7 +74,9 @@ export async function calculateETAGoogle(busLocation, waypoints) {
       if (route.legs && route.legs.length > 0) {
         route.legs.forEach((leg) => {
           if (leg.duration) {
-            const seconds = parseInt(leg.duration.replace('s', ''), 10)
+            const seconds = typeof leg.duration === 'object'
+              ? leg.duration.seconds
+              : parseInt(leg.duration.replace('s', ''), 10)
             totalSeconds += seconds
           }
         })
@@ -122,7 +111,7 @@ export async function calculateETAPredictor(busData, waypoints) {
   }
 
   try {
-    const response = await axios.post(`${API_BASE_URL}/predictions/eta`, {
+    const response = await axios.post(`${PREDICTOR_BASE_URL}/predictions/eta`, {
       bus_id: busData.id,
       placa: busData.placa,
       current_location: {

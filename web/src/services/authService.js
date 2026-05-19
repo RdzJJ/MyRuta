@@ -1,29 +1,90 @@
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  createUserWithEmailAndPassword
+} from 'firebase/auth'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { auth, db } from '../config/firebase'
+
 /**
- * MyRuta Web - Auth Service
- * 
- * Responsibilities:
- * - Login and registration
- * - Token management
+ * Login con email y contraseña
  */
+export async function login(email, password) {
+  const userCredential = await signInWithEmailAndPassword(auth, email, password)
+  const user = userCredential.user
 
-import api from './api'
+  // Obtener datos del usuario desde Firestore
+  const userDoc = await getDoc(doc(db, 'users', user.uid))
+  if (!userDoc.exists()) {
+    throw new Error('Usuario no encontrado en la base de datos')
+  }
 
-export const authService = {
-  login: async (email, password) => {
-    return api.post('/auth/login', { email, password })
-  },
-
-  register: async (userData) => {
-    return api.post('/auth/register', userData)
-  },
-
-  refreshToken: async (token) => {
-    return api.post('/auth/refresh', { token })
-  },
-
-  logout: async () => {
-    return api.post('/auth/logout')
+  return {
+    uid: user.uid,
+    email: user.email,
+    ...userDoc.data()
   }
 }
 
-export default authService
+/**
+ * Logout
+ */
+export async function logout() {
+  await signOut(auth)
+}
+
+/**
+ * Registrar nuevo usuario (solo admin debería llamar esto)
+ */
+export async function registerUser(email, password, userData) {
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+  const user = userCredential.user
+
+  // Guardar datos adicionales en Firestore
+  await setDoc(doc(db, 'users', user.uid), {
+    email,
+    nombre: userData.nombre,
+    apellido: userData.apellido || '',
+    rol: userData.rol || 'CONDUCTOR',
+    createdAt: new Date()
+  })
+
+  return user
+}
+
+/**
+ * Observar cambios en el estado de autenticación
+ */
+export function onAuthChange(callback) {
+  return onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      callback(null)
+      return
+    }
+
+    try {
+      const userDoc = await getDoc(doc(db, 'users', user.uid))
+      if (userDoc.exists()) {
+        callback({ uid: user.uid, email: user.email, ...userDoc.data() })
+      } else {
+        callback(null)
+      }
+    } catch {
+      callback(null)
+    }
+  })
+}
+
+/**
+ * Obtener usuario actual con su rol
+ */
+export async function getCurrentUser() {
+  const user = auth.currentUser
+  if (!user) return null
+
+  const userDoc = await getDoc(doc(db, 'users', user.uid))
+  if (!userDoc.exists()) return null
+
+  return { uid: user.uid, email: user.email, ...userDoc.data() }
+}

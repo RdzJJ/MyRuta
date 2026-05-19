@@ -1,40 +1,9 @@
-"""
-MyRuta Predictor - Configuration Settings
-
-This module manages all application configuration through environment variables.
-Uses Pydantic for validation and type safety.
-
-Responsibilities:
-- Load environment variables from .env file
-- Validate configuration values
-- Provide type-safe access to settings
-- Define configuration defaults
-"""
-
 import os
 from typing import Optional
 
 from pydantic_settings import BaseSettings
 
-
 class Settings(BaseSettings):
-    """
-    Application settings loaded from environment variables.
-    
-    Attributes:
-        PORT: Server port (default: 8001)
-        ENV: Environment type (development/production)
-        DEBUG: Enable debug mode
-        BACKEND_URL: Backend API base URL
-        BACKEND_API_KEY: API key for backend authentication
-        DATABASE_URL: PostgreSQL connection string
-        REDIS_URL: Redis connection string
-        JWT_SECRET: JWT secret for token verification
-        MLB_MODEL_PATH: Path to trained ML model file
-        LOG_LEVEL: Logging level
-        LOG_FILE: Log file path
-        ALLOWED_ORIGINS: CORS allowed origins
-    """
 
     # Server Configuration
     PORT: int = 8001
@@ -52,6 +21,10 @@ class Settings(BaseSettings):
     # Authentication
     JWT_SECRET: str = "your_jwt_secret_here"
     JWT_ALGORITHM: str = "HS256"
+
+    # Firebase
+    FIREBASE_SERVICE_ACCOUNT_PATH: str = "./firebase-service-account.json"
+    FIREBASE_DATABASE_URL: str = "https://myruta-7cbf2-default-rtdb.firebaseio.com"
 
     # Machine Learning
     ML_MODEL_PATH: str = "./models/delay_predictor_model.pkl"
@@ -82,6 +55,7 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = True
+        protected_namespaces = ()
 
     @property
     def is_production(self) -> bool:

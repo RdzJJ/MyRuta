@@ -35,7 +35,6 @@ export default function Footer() {
             <h4 className="text-neon-500 font-semibold mb-4">Contacto</h4>
             <p className="text-neon-500 opacity-75 text-sm">
               📧 info@myruta.com<br />
-              📞 +58 123 456 7890
             </p>
           </div>
         </div>

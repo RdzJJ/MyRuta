@@ -1,13 +1,3 @@
-/**
- * MyRuta Web - Medellín Map Component
- * 
- * Features:
- * - Display Google Map centered on Medellín
- * - Dark theme matching UI
- * - Neon green accent markers
- * - Real-time location display
- */
-
 import { useState, useEffect, useRef } from 'react'
 
 const MEDELLIN_CENTER = {
@@ -15,13 +5,10 @@ const MEDELLIN_CENTER = {
   lng: -75.5812
 }
 
-let googleMapsLoaded = false
-let googleMapsScript = null
-
 const DARK_MAP_STYLE = [
   { elementType: 'geometry', stylers: [{ color: '#1a1a1a' }] },
   { elementType: 'labels.text.stroke', stylers: [{ color: '#1a1a1a' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#aaa' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#ffffff' }] },
   {
     featureType: 'administrative',
     elementType: 'geometry.stroke',
@@ -82,7 +69,7 @@ const DARK_MAP_STYLE = [
   {
     featureType: 'road.local',
     elementType: 'labels.text.fill',
-    stylers: [{ color: '#666' }]
+    stylers: [{ color: '#ffffff' }]
   },
   {
     featureType: 'transit',
@@ -111,57 +98,89 @@ const DARK_MAP_STYLE = [
   {
     featureType: 'water',
     elementType: 'labels.text.fill',
-    stylers: [{ color: '#666' }]
+    stylers: [{ color: '#ffffff' }]
   }
 ]
 
-export default function MedellinMap({ 
-  busLocations = [], 
-  selectedLocation = null,
-  className = ''
-}) {
-  const [map, setMap] = useState(null)
-  const [markers, setMarkers] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const mapRef = useRef(null)
-  const destinationMarkerRef = useRef(null)
+// ─── FIX 1: Use a Promise-based singleton to track the Maps load state ────────
+// This avoids the race condition where the second useEffect runs before
+// window.google.maps is available.
+let mapsLoadPromise = null
 
-  // Load Google Maps script once globally
-  useEffect(() => {
-    if (googleMapsLoaded || googleMapsScript) {
-      if (window.google?.maps) {
-        setIsLoading(false)
-      }
+function loadGoogleMaps(apiKey) {
+  if (mapsLoadPromise) return mapsLoadPromise
+
+  mapsLoadPromise = new Promise((resolve, reject) => {
+    // Already loaded (e.g. hot-reload)
+    if (window.google?.maps) {
+      resolve()
       return
     }
 
-    googleMapsScript = document.createElement('script')
-    googleMapsScript.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
-    googleMapsScript.async = true
-    googleMapsScript.defer = true
-    googleMapsScript.onload = () => {
-      googleMapsLoaded = true
-      setIsLoading(false)
+    const script = document.createElement('script')
+    // FIX 2: Use the recommended "loading=async" parameter and a callback
+    //         instead of relying on the script's onload event, which can fire
+    //         before the Maps namespace is fully initialised.
+    const callbackName = '__googleMapsReady__'
+    window[callbackName] = () => {
+      delete window[callbackName]
+      resolve()
     }
-    googleMapsScript.onerror = () => {
-      console.error('Failed to load Google Maps API')
-      setIsLoading(false)
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=${callbackName}&loading=async&libraries=places&v=weekly`
+    script.async = true
+    script.defer = true
+    script.onerror = () => {
+      mapsLoadPromise = null // allow retry
+      reject(new Error('Failed to load Google Maps API'))
     }
-    document.head.appendChild(googleMapsScript)
+    document.head.appendChild(script)
+  })
 
-    return () => {
-      // Don't remove the script to avoid reloading
+  return mapsLoadPromise
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+export default function MedellinMap({
+  busLocations = [],
+  selectedLocation = null,
+  originLocation = null,
+  className = ''
+}) {
+  const [map, setMap] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState(null)
+  const mapContainerRef = useRef(null)
+  const mapInstanceRef = useRef(null)    // stable ref to avoid stale closures
+  const markersRef = useRef([])
+  const destinationMarkerRef = useRef(null)
+  const originMarkerRef = useRef(null)
+
+  // ── Load Google Maps script (once, globally) ──────────────────────────────
+  useEffect(() => {
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+    if (!apiKey) {
+      setLoadError('VITE_GOOGLE_MAPS_API_KEY is not set')
+      setIsLoading(false)
+      return
     }
+
+    loadGoogleMaps(apiKey)
+      .then(() => setIsLoading(false))
+      .catch(err => {
+        setLoadError(err.message)
+        setIsLoading(false)
+      })
   }, [])
 
-  // Initialize map once when Google Maps is loaded
+  // ── Initialise the map once Maps is ready ─────────────────────────────────
   useEffect(() => {
-    if (isLoading || map) return
+    // FIX 3: Guard with isLoading AND verify window.google.maps before
+    //         calling the constructor. Without this guard the constructor
+    //         runs while the namespace is still undefined → TypeError.
+    if (isLoading || loadError || mapInstanceRef.current) return
+    if (!mapContainerRef.current || !window.google?.maps) return
 
-    const mapContainer = document.getElementById('medellin-map-container')
-    if (!mapContainer || !window.google?.maps) return
-
-    const newMap = new window.google.maps.Map(mapContainer, {
+    const newMap = new window.google.maps.Map(mapContainerRef.current, {
       center: MEDELLIN_CENTER,
       zoom: 13,
       styles: DARK_MAP_STYLE,
@@ -169,124 +188,209 @@ export default function MedellinMap({
       zoomControl: true,
       mapTypeControl: false,
       fullscreenControl: true,
-      streetViewControl: false
+      streetViewControl: true
     })
 
-    mapRef.current = newMap
-    setMap(newMap)
-  }, [isLoading, map])
+    mapInstanceRef.current = newMap
+    setMap(newMap) // triggers downstream effects
 
-  // Update bus markers
+  }, [isLoading, loadError])
+  // Real-time user location
   useEffect(() => {
-    if (!mapRef.current) return
+    if (!mapInstanceRef.current || !navigator.geolocation) return
+
+    let userMarker = null
+
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const userLatLng = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+
+        if (!userMarker) {
+          userMarker = new window.google.maps.Marker({
+            position: userLatLng,
+            map: mapInstanceRef.current,
+            title: 'Mi ubicación',
+            icon: {
+              path: window.google.maps.SymbolPath.CIRCLE,
+              scale: 8,
+              fillColor: '#4285F4',
+              fillOpacity: 1,
+              strokeColor: '#fff',
+              strokeWeight: 2
+            }
+          })
+        } else {
+          userMarker.setPosition(userLatLng)
+        }
+      },
+      (err) => console.warn('Geolocation error:', err),
+      { enableHighAccuracy: true, maximumAge: 5000 }
+    )
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId)
+      if (userMarker) userMarker.setMap(null)
+    }
+  }, [map]) // depende de `map` para esperar inicialización
+
+
+  // ── Update bus markers ────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!mapInstanceRef.current) return
 
     // Clear existing markers
-    markers.forEach(marker => marker.setMap(null))
+    markersRef.current.forEach(m => m.setMap(null))
+    markersRef.current = []
 
-    // Only add markers if there are bus locations
-    if (busLocations.length === 0) {
-      setMarkers([])
-      return
+    if (busLocations.length === 0) return
+
+    const newMarkers = busLocations
+      .map((bus, idx) => {
+        const lat = bus.latitude ?? bus.lat
+        const lng = bus.longitude ?? bus.lng
+        if (lat == null || lng == null) return null
+
+        const marker = new window.google.maps.Marker({
+          position: { lat, lng },
+          map: mapInstanceRef.current,
+          title: bus.label || `Bus ${idx + 1}`,
+          icon: {
+            path: window.google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            fillColor: '#00FF41',
+            fillOpacity: 0.8,
+            strokeColor: '#00AA00',
+            strokeWeight: 2
+          }
+        })
+
+        const infoWindow = new window.google.maps.InfoWindow({
+          content: `
+            <div style="color:#00FF41;font-family:monospace;padding:8px;background:#1a1a1a;border:1px solid #00FF41;">
+              <strong>${bus.label || `Bus ${idx + 1}`}</strong><br/>
+              Lat: ${lat.toFixed(4)}<br/>
+              Lng: ${lng.toFixed(4)}
+            </div>
+          `
+        })
+
+        marker.addListener('click', () =>
+          infoWindow.open(mapInstanceRef.current, marker)
+        )
+
+        return marker
+      })
+      .filter(Boolean)
+
+    markersRef.current = newMarkers
+  }, [busLocations, map]) // depend on `map` state so we wait for initialisation
+
+  // ── Origin + Destination marker + zoom ────────────────────────────────────────────────────
+  useEffect(() => {
+    // Limpiar markers anteriores
+    if (destinationMarkerRef.current) {
+      destinationMarkerRef.current.setMap(null)
+      destinationMarkerRef.current = null
+    }
+    if (originMarkerRef.current) {
+      originMarkerRef.current.setMap(null)
+      originMarkerRef.current = null
     }
 
-    // Add bus location markers
-    const newMarkers = busLocations.map((bus, idx) => {
-      if (!bus.latitude && !bus.lat) return null
+    if (!selectedLocation && !originLocation) return
+    if (!selectedLocation) return
+    if (!mapInstanceRef.current) return
 
-      const marker = new window.google.maps.Marker({
-        position: {
-          lat: bus.latitude || bus.lat,
-          lng: bus.longitude || bus.lng
-        },
-        map: mapRef.current,
-        title: bus.label || `Bus ${idx + 1}`,
+    // Pin de destino (verde neón)
+    if (selectedLocation?.latitude && selectedLocation?.longitude) {
+      const destMarker = new window.google.maps.Marker({
+        position: { lat: Number(selectedLocation.latitude), lng: Number(selectedLocation.longitude) },
+        map: mapInstanceRef.current,
+        title: selectedLocation.displayName || 'Destino',
+        icon: {
+          path: window.google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+          scale: 6,
+          fillColor: '#00FF41',
+          fillOpacity: 1,
+          strokeColor: '#000',
+          strokeWeight: 1.5
+        }
+      })
+
+      const infoWindow = new window.google.maps.InfoWindow({
+        content: `
+          <div style="color:#00FF41;font-family:monospace;padding:8px;background:#1a1a1a;border:1px solid #00FF41;">
+            <strong>Destino</strong><br/>
+            ${selectedLocation.displayName}<br/>
+            ${selectedLocation.address ?? ''}
+          </div>
+        `
+      })
+      infoWindow.open(mapInstanceRef.current, destMarker)
+      destinationMarkerRef.current = destMarker
+    }
+
+    // Pin de origen (azul)
+    if (originLocation?.latitude && originLocation?.longitude) {
+      const origMarker = new window.google.maps.Marker({
+        position: { lat: Number(originLocation.latitude), lng: Number(originLocation.longitude) },
+        map: mapInstanceRef.current,
+        title: originLocation.displayName || 'Origen',
         icon: {
           path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 10,
-          fillColor: '#00FF41',
-          fillOpacity: 0.8,
-          strokeColor: '#00AA00',
+          scale: 9,
+          fillColor: '#4285F4',
+          fillOpacity: 1,
+          strokeColor: '#fff',
           strokeWeight: 2
         }
       })
 
-      // Add info window
       const infoWindow = new window.google.maps.InfoWindow({
         content: `
-          <div style="color: #00FF41; font-family: monospace; padding: 8px; background: #1a1a1a; border: 1px solid #00FF41;">
-            <strong>${bus.label || `Bus ${idx + 1}`}</strong><br/>
-            Lat: ${(bus.latitude || bus.lat).toFixed(4)}<br/>
-            Lng: ${(bus.longitude || bus.lng).toFixed(4)}
+          <div style="color:#4285F4;font-family:monospace;padding:8px;background:#1a1a1a;border:1px solid #4285F4;">
+            <strong>Origen</strong><br/>
+            ${originLocation.displayName}<br/>
+            ${originLocation.address ?? ''}
           </div>
         `
       })
+      infoWindow.open(mapInstanceRef.current, origMarker)
+      originMarkerRef.current = origMarker
+    }
 
-      marker.addListener('click', () => {
-        // Close previous info windows
-        infoWindow.open(mapRef.current, marker)
-      })
+    // Zoom: si hay ambos puntos → fitBounds; si solo destino → panTo + zoom
+    const destLat = Number(selectedLocation?.latitude)
+    const destLng = Number(selectedLocation?.longitude)
+    const origLat = Number(originLocation?.latitude)
+    const origLng = Number(originLocation?.longitude)
 
-      return marker
-    }).filter(Boolean)
-
-    setMarkers(newMarkers)
-  }, [busLocations])
-
-  // Add selected destination marker
-  useEffect(() => {
-    if (!mapRef.current || !selectedLocation) {
-      // Clean up previous marker
-      if (destinationMarkerRef.current) {
-        destinationMarkerRef.current.setMap(null)
-        destinationMarkerRef.current = null
-      }
+    if (!selectedLocation || isNaN(destLat) || isNaN(destLng) || (destLat === 0 && destLng === 0)) {
+      console.warn('selectedLocation tiene coordenadas inválidas:', selectedLocation)
       return
     }
 
-    // Remove previous destination marker
-    if (destinationMarkerRef.current) {
-      destinationMarkerRef.current.setMap(null)
+    if (!isNaN(origLat) && !isNaN(origLng)) {
+      const bounds = new window.google.maps.LatLngBounds()
+      bounds.extend(new window.google.maps.LatLng(destLat, destLng))
+      bounds.extend(new window.google.maps.LatLng(origLat, origLng))
+      mapInstanceRef.current.fitBounds(bounds, 60)
+    } else {
+      mapInstanceRef.current.panTo(new window.google.maps.LatLng(destLat, destLng))
+      mapInstanceRef.current.setZoom(16)
     }
 
-    const destinationMarker = new window.google.maps.Marker({
-      position: {
-        lat: selectedLocation.latitude,
-        lng: selectedLocation.longitude
-      },
-      map: mapRef.current,
-      title: selectedLocation.displayName || 'Destination',
-      icon: {
-        path: 'M12 0C5.383 0 0 5.383 0 12s5.383 12 12 12 12-5.383 12-12S18.617 0 12 0z',
-        scale: 1.5,
-        fillColor: '#00FF41',
-        fillOpacity: 1,
-        strokeColor: '#000',
-        strokeWeight: 2
-      }
-    })
-
-    const infoWindow = new window.google.maps.InfoWindow({
-      content: `
-        <div style="color: #00FF41; font-family: monospace; padding: 8px; background: #1a1a1a; border: 1px solid #00FF41;">
-          <strong>Destino</strong><br/>
-          ${selectedLocation.displayName}<br/>
-          ${selectedLocation.address ? `${selectedLocation.address}` : ''}
-        </div>
-      `
-    })
-
-    infoWindow.open(mapRef.current, destinationMarker)
-    destinationMarkerRef.current = destinationMarker
-  }, [selectedLocation])
+  }, [selectedLocation, originLocation, map])
 
   return (
-    <div className={`relative w-full h-96 bg-dark-800 border-2 border-neon-500 rounded-xl overflow-hidden ${className}`} style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.2)' }}>
-      <div 
-        id="medellin-map-container" 
-        className="w-full h-full bg-dark-700"
-      />
-      
-      {/* Map Loading State */}
+    <div
+      className={`relative w-full h-96 bg-dark-800 border-2 border-neon-500 rounded-xl overflow-hidden ${className}`}
+      style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.2)' }}
+    >
+      {/* FIX 4: Use a ref instead of getElementById so React controls the node */}
+      <div ref={mapContainerRef} className="w-full h-full bg-dark-700" />
+
+      {/* Loading state */}
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-dark-800 bg-opacity-90 z-10">
           <div className="text-center">
@@ -298,9 +402,24 @@ export default function MedellinMap({
         </div>
       )}
 
-      {/* Map Legend */}
-      {!isLoading && (
-        <div className="absolute bottom-4 left-4 bg-dark-800 border border-neon-500 rounded-lg p-3 text-xs z-20" style={{ boxShadow: '0 0 10px rgba(0, 255, 65, 0.2)' }}>
+      {/* Error state */}
+      {loadError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-dark-800 bg-opacity-90 z-10">
+          <div className="text-center px-4">
+            <p className="text-red-500 font-mono text-sm">{loadError}</p>
+            <p className="text-gray-400 text-xs mt-2">
+              Verifica tu API Key y que no esté bloqueada por un adblocker.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Legend */}
+      {!isLoading && !loadError && (
+        <div
+          className="absolute bottom-4 left-4 bg-dark-800 border border-neon-500 rounded-lg p-3 text-xs z-20"
+          style={{ boxShadow: '0 0 10px rgba(0, 255, 65, 0.2)' }}
+        >
           <p className="text-neon-500 font-semibold mb-2">Leyenda</p>
           <div className="space-y-1 text-gray-300">
             <div className="flex items-center gap-2">
@@ -310,6 +429,10 @@ export default function MedellinMap({
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-neon-500" />
               <span>Destino</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-blue-500" />
+              <span>Origen</span>
             </div>
           </div>
         </div>

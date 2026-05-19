@@ -14,6 +14,7 @@ import {
   getRutas
 } from '../../services/firestoreService'
 import { formatETA } from '../../services/etaService'
+import { formatDateTime } from '../../utils/dateFormatter'
 
 export default function HistorialRecorridos() {
   const [historial, setHistorial] = useState([])
@@ -59,7 +60,7 @@ export default function HistorialRecorridos() {
       {/* Header */}
       <div className="bg-dark-800 border-2 border-neon-500 rounded-xl p-6" style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.2)' }}>
         <h2 className="text-2xl font-bold text-neon-500 mb-4" style={{ textShadow: '0 0 10px rgba(0, 255, 65, 0.6)' }}>
-          📋 Historial de Recorridos
+          Historial de Recorridos
         </h2>
 
         {/* Route Filter */}
@@ -116,10 +117,7 @@ export default function HistorialRecorridos() {
                     className="border-b border-neon-500 border-opacity-30 hover:bg-dark-700 transition"
                   >
                     <td className="py-4 px-6 text-neon-500 font-semibold">
-                      {new Date(registro.fecha).toLocaleString('es-CO', {
-                        dateStyle: 'short',
-                        timeStyle: 'short'
-                      })}
+                      {formatDateTime(registro.fecha)}
                     </td>
                     <td className="py-4 px-6 text-neon-500 font-mono font-bold">
                       {registro.busPlaca}
@@ -145,13 +143,6 @@ export default function HistorialRecorridos() {
             </table>
           </div>
         )}
-      </div>
-
-      {/* Info Box */}
-      <div className="bg-dark-800 border-2 border-neon-500 rounded-xl p-4" style={{ boxShadow: '0 0 15px rgba(0, 255, 65, 0.2)' }}>
-        <p className="text-neon-500 text-sm">
-          ✓ <strong>Tiempos Estimados vs Reales:</strong> Compara el rendimiento de rutas y conductores. Los tiempos se calculan usando Google Routes API con tráfico en tiempo real.
-        </p>
       </div>
     </div>
   )

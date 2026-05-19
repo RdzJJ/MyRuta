@@ -8,11 +8,13 @@
  */
 
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import AdminRealtimeMap from '../../components/Maps/AdminRealtimeMap'
 import HistorialRecorridos from '../../components/admin/HistorialRecorridos'
 import { getBuses, getRutas } from '../../services/firestoreService'
 
 export default function Dashboard() {
+  const navigate = useNavigate()
   const [stats, setStats] = useState({
     rutasActivas: 0,
     conductores: 0,
@@ -52,7 +54,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-5xl font-bold text-neon-500 mb-2" style={{ textShadow: '0 0 20px rgba(0, 255, 65, 0.8)' }}>
-            📊 Dashboard Administrativo
+            Dashboard Administrativo
           </h1>
           <div className="h-1 w-24 bg-gradient-to-r from-neon-500 to-transparent"></div>
         </div>
@@ -84,51 +86,29 @@ export default function Dashboard() {
           <HistorialRecorridos />
         </div>
 
-        {/* System Statistics */}
-        <div className="bg-dark-800 border-2 border-neon-500 rounded-xl p-8 mb-8" style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.2)' }}>
-          <h2 className="text-2xl font-bold text-neon-500 mb-4" style={{ textShadow: '0 0 10px rgba(0, 255, 65, 0.6)' }}>
-            📈 Información del Sistema
-          </h2>
-          <div className="h-1 w-12 bg-gradient-to-r from-neon-500 to-transparent mb-6"></div>
-          
-          <div className="space-y-4">
-            <div className="bg-dark-700 border-l-4 border-neon-500 p-4 rounded" style={{ boxShadow: '0 0 10px rgba(0, 255, 65, 0.1)' }}>
-              <p className="text-neon-500">
-                ✓ <strong>Mapa en Tiempo Real:</strong> Visualiza todos los buses y rutas activas con actualizaciones cada 2 segundos.
-              </p>
-            </div>
-            
-            <div className="bg-dark-700 border-l-4 border-neon-500 p-4 rounded" style={{ boxShadow: '0 0 10px rgba(0, 255, 65, 0.1)' }}>
-              <p className="text-neon-500">
-                ✓ <strong>Historial de Recorridos:</strong> Consulta el desempeño de cada bus, conductor y ruta con comparativas de tiempos estimados vs reales.
-              </p>
-            </div>
-
-            <div className="bg-dark-700 border-l-4 border-neon-500 p-4 rounded" style={{ boxShadow: '0 0 10px rgba(0, 255, 65, 0.1)' }}>
-              <p className="text-neon-500">
-                ✓ <strong>Filtros Inteligentes:</strong> Selecciona rutas específicas para ver solo buses y registros de esa ruta.
-              </p>
-            </div>
-
-            <div className="bg-dark-700 border-l-4 border-neon-500 p-4 rounded" style={{ boxShadow: '0 0 10px rgba(0, 255, 65, 0.1)' }}>
-              <p className="text-neon-500">
-                ✓ <strong>Información de Conductores:</strong> Haz clic en los buses del mapa para ver detalles del conductor, número de viajes y rutas asignadas.
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {['📝 Crear Nueva Ruta', '👥 Gestionar Conductores', '📊 Ver Reportes'].map((action, idx) => (
-            <button
-              key={idx}
-              className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-4 px-6 rounded-xl hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
-              style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.4)' }}
-            >
-              {action}
-            </button>
-          ))}
+          <button
+            onClick={() => navigate('/admin/rutas')}
+            className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-4 px-6 rounded-xl hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
+            style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.4)' }}
+          >
+            Crear Nueva Ruta
+          </button>
+          <button
+            onClick={() => navigate('/admin/conductores')}
+            className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-4 px-6 rounded-xl hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
+            style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.4)' }}
+          >
+            Gestionar Conductores
+          </button>
+          <button
+            onClick={() => navigate('/admin/reportes')}
+            className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-4 px-6 rounded-xl hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
+            style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.4)' }}
+          >
+            Ver Reportes
+          </button>
         </div>
       </main>
     </div>

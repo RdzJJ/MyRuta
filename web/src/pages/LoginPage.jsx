@@ -1,20 +1,28 @@
-/**
- * MyRuta Web - Login Page
- * 
- * Responsibilities:
- * - Display login form
- * - Handle authentication
- * - Call backend API for login
- */
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
-  
+  const { login, user } = useAuth();
+
+  useEffect(() => {
+    if (!user?.rol) return;
+
+    switch (user.rol) {
+      case 'ADMIN':
+        navigate('/admin/dashboard', { replace: true });
+        break;
+
+      case 'CONDUCTOR':
+        navigate('/conductor/tracking', { replace: true });
+        break;
+
+      default:
+        navigate('/cliente/rutas', { replace: true });
+    }
+  }, [user?.rol, navigate]);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -29,48 +37,17 @@ export default function LoginPage() {
     try {
       // Validate inputs
       if (!email || !password) {
-        throw new Error('Email and password are required');
+        throw new Error('El correo y la contraseña son requeridos');
       }
 
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        throw new Error('Invalid email format');
+        throw new Error('Formato de correo inválido');
       }
 
       // Call backend API
-      const response = await fetch('http://localhost:3000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-
-      // Update auth context with token and user
-      const authData = {
-        token: data.token,
-        user: data.user
-      };
-
-      // Save to localStorage and update context
-      localStorage.setItem('authToken', data.token);
-      localStorage.setItem('authUser', JSON.stringify(data.user));
-      
-      login(authData);
+      const userData = await login(email, password);
 
       // Redirect based on role
-      if (data.user.role === 'ADMIN') {
-        navigate('/admin/dashboard');
-      } else if (data.user.role === 'CONDUCTOR') {
-        navigate('/conductor/tracking');
-      } else {
-        navigate('/cliente/rutas');
-      }
     } catch (err) {
       setError(err.message || 'Login failed. Please try again.');
       console.error('Login error:', err);
@@ -82,7 +59,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-dark-900 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Grid background effect */}
-      <div className="fixed inset-0 opacity-5 pointer-events-none" 
+      <div className="fixed inset-0 opacity-5 pointer-events-none"
         style={{
           backgroundImage: 'linear-gradient(0deg, transparent 24%, rgba(0, 255, 65, 0.05) 25%, rgba(0, 255, 65, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 65, 0.05) 75%, rgba(0, 255, 65, 0.05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 255, 65, 0.05) 25%, rgba(0, 255, 65, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 65, 0.05) 75%, rgba(0, 255, 65, 0.05) 76%, transparent 77%, transparent)',
           backgroundSize: '50px 50px'
@@ -159,7 +136,7 @@ export default function LoginPage() {
             className="w-full bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-3 px-4 rounded-lg hover:from-neon-400 hover:to-neon-500 disabled:opacity-50 disabled:cursor-not-allowed transition transform hover:scale-105"
             style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.5)' }}
           >
-            {loading ? '⏳ Iniciando sesión...' : '🔓 Iniciar Sesión'}
+            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
         </form>
 

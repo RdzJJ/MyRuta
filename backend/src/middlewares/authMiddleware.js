@@ -7,6 +7,7 @@
  * - Reject requests without valid token
  */
 
+import jwt from 'jsonwebtoken';
 import { logger } from '../utils/logger.js';
 
 export function authMiddleware(req, res, next) {
@@ -17,15 +18,14 @@ export function authMiddleware(req, res, next) {
       return res.status(401).json({ error: 'No token provided' });
     }
 
-    // TODO: Verify JWT using jwt.verify()
-    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // req.user = decoded;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    req.user = decoded;
 
-    logger.info('Auth middleware: token verified');
+    logger.info(`Auth middleware: token verified for user ${decoded.email}`);
     next();
   } catch (error) {
-    logger.error('Auth middleware error:', error);
-    res.status(401).json({ error: 'Invalid token' });
+    logger.error('Auth middleware error:', error.message);
+    res.status(401).json({ error: 'Invalid or expired token' });
   }
 }
 
