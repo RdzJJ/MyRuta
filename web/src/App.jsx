@@ -5,6 +5,7 @@ import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
 import NotFoundPage from './pages/NotFoundPage'
+import Footer from './components/Layout/Footer'
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard'
@@ -101,6 +102,7 @@ function App() {
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </main>
+            <Footer />
           </div>
         </LocationProvider>
       </AuthProvider>
