@@ -142,3 +142,12 @@ export async function getHistorialRecorridos(rutaId = null) {
   const snap = await getDocs(q)
   return snap.docs.map(d => ({ id: d.id, ...d.data() }))
 }
+
+// ─── SUSCRIPCIÓN A CONDUCTORES EN TIEMPO REAL ──────────────
+
+export function subscribeToConductores(callback) {
+  return onSnapshot(collection(db, 'conductors'), snap => {
+    const conductores = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+    callback(conductores)
+  })
+}

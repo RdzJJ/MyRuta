@@ -43,18 +43,18 @@ export default function Navbar() {
           {isAuthenticated && user ? (
             <div className="flex items-center gap-4">
               {/* Admin Dashboard Link */}
-              {user.role === 'ADMIN' && (
+              {user.rol === 'ADMIN' && (
                 <Link
                   to="/admin/dashboard"
                   className="px-4 py-2 rounded-lg bg-dark-700 border border-neon-500 text-neon-500 hover:bg-neon-500 hover:text-dark-900 transition font-semibold"
                   style={{ boxShadow: '0 0 10px rgba(0, 255, 65, 0.3)' }}
                 >
-                  📊 Dashboard Admin
+                  Dashboard Admin
                 </Link>
               )}
 
               {/* Conductor Tracking Link */}
-              {user.role === 'CONDUCTOR' && (
+              {user.rol === 'CONDUCTOR' && (
                 <Link
                   to="/conductor/tracking"
                   className="px-4 py-2 rounded-lg bg-dark-700 border border-neon-500 text-neon-500 hover:bg-neon-500 hover:text-dark-900 transition font-semibold"
@@ -69,7 +69,7 @@ export default function Navbar() {
                 <div className="text-sm text-neon-500 font-semibold">
                   {user.firstName} {user.lastName}
                 </div>
-                <div className="text-xs text-neon-500 opacity-70">{user.role}</div>
+                <div className="text-xs text-neon-500 opacity-70">{user.rol}</div>
               </div>
 
               {/* Logout Button */}
@@ -98,7 +98,7 @@ export default function Navbar() {
       <div className="bg-dark-800 px-4 py-2 text-sm border-t border-neon-500 border-opacity-30">
         {isAuthenticated && user ? (
           <span className="text-neon-500" style={{ textShadow: '0 0 5px rgba(0, 255, 65, 0.5)' }}>
-            ✓ Sesión activa como <strong>{user.role}</strong>
+            ✓ Sesión activa como <strong>{user.rol}</strong>
           </span>
         ) : (
           <span className="text-neon-500 opacity-75">

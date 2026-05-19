@@ -12,13 +12,12 @@ export function AuthProvider({ children }) {
       setUser(userData)
       setLoading(false)
     })
-    return () => unsubscribe()
+
+    return unsubscribe
   }, [])
 
   const handleLogin = async (email, password) => {
-    const userData = await login(email, password)
-    setUser(userData)
-    return userData
+    return await login(email, password)
   }
 
   const handleLogout = async () => {
@@ -32,10 +31,11 @@ export function AuthProvider({ children }) {
       loading,
       login: handleLogin,
       logout: handleLogout,
+      isAuthenticated: !!user,
       isAdmin: user?.rol === 'ADMIN',
       isConductor: user?.rol === 'CONDUCTOR'
     }}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   )
 }

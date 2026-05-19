@@ -232,7 +232,7 @@ export default function AdminRealtimeMap() {
                         {conductor?.numeroDeViajes || "0"}
                       </td>
                       <td className="py-4 px-6 text-neon-500 font-semibold">
-                        {bus.velocidad.toFixed(1)} km/h
+                        {(bus.velocidad ?? 0).toFixed(1)} km/h
                       </td>
                       <td className="py-4 px-6 text-neon-500 text-sm opacity-90">
                         {etas[bus.id] || "Calculando..."}

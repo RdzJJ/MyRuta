@@ -1,4 +1,4 @@
-import { doc, updateDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../config/firebase'
 import { registerUser } from './authService'
 import { getConductores, getConductor } from './firestoreService'
@@ -23,8 +23,8 @@ export async function crearConductor(conductorData) {
 
     const conductorId = userCredential.uid
 
-    // Crear documento adicional en colección 'conductors'
-    await updateDoc(doc(db, 'conductors', conductorId), {
+    // Crear documento en colección 'conductors' con el uid como ID
+    await setDoc(doc(db, 'conductors', conductorId), {
       nombre,
       email,
       telefono,
