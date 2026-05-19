@@ -150,7 +150,7 @@ export default function DestinationSearch({
                       onClick={() => handleSuggestionClick(suggestion)}
                       className="w-full px-4 py-3 text-left text-white hover:bg-dark-600 transition border-b border-dark-600 last:border-b-0 flex items-start gap-3"
                     >
-                      <span className="text-neon-500 text-lg flex-shrink-0">📍</span>
+                      <span className="text-neon-500 text-lg flex-shrink-0"></span>
                       <div className="flex-1 min-w-0">
                         <div className="text-white truncate font-medium">{primaryText}</div>
                         {secondaryText && <div className="text-gray-400 text-sm truncate">{secondaryText}</div>}
@@ -183,7 +183,7 @@ export default function DestinationSearch({
                   <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
                 </div>
               ) : (
-                '📍'
+                ''
               )}
               <span className="hidden sm:inline">Mi ubicación</span>
             </button>

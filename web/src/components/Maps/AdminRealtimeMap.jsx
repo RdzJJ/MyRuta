@@ -102,7 +102,7 @@ export default function AdminRealtimeMap() {
       {/* Header */}
       <div className="bg-dark-800 border-2 border-neon-500 rounded-xl p-6" style={{ boxShadow: "0 0 20px rgba(0, 255, 65, 0.2)" }}>
         <h2 className="text-2xl font-bold text-neon-500 mb-4" style={{ textShadow: "0 0 10px rgba(0, 255, 65, 0.6)" }}>
-          🚌 Monitoreo de Buses en Tiempo Real
+          Monitoreo de Buses en Tiempo Real
         </h2>
 
         {/* Route Selector */}
@@ -192,13 +192,6 @@ export default function AdminRealtimeMap() {
             </table>
           </div>
         )}
-      </div>
-
-      {/* Info Box */}
-      <div className="bg-dark-800 border-2 border-neon-500 rounded-xl p-4" style={{ boxShadow: "0 0 15px rgba(0, 255, 65, 0.2)" }}>
-        <p className="text-neon-500 text-sm">
-          ✓ <strong>{filteredBuses.length}</strong> buses activos. Las ETAs se calculan automáticamente cada 60 segundos usando Google Routes API con datos de tráfico en tiempo real.
-        </p>
       </div>
     </div>
   )

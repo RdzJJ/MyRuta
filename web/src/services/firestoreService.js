@@ -307,10 +307,12 @@ export async function calculateETA(busLocation, destination) {
 
     if (response.data.routes && response.data.routes.length > 0) {
       const route = response.data.routes[0]
-      const legsDuration = route.legs.reduce(
-        (sum, leg) => sum + parseInt(leg.duration.replace(/s/, ''), 10),
-        0
-      )
+      const legsDuration = route.legs.reduce((sum, leg) => {
+        const seconds = typeof leg.duration === 'object'
+          ? leg.duration.seconds
+          : parseInt(leg.duration.replace(/s/, ''), 10)
+        return sum + seconds
+      }, 0)
       return Math.ceil(legsDuration / 60) // Convert to minutes
     }
 

@@ -320,7 +320,7 @@ export default function MedellinMap({
       const infoWindow = new window.google.maps.InfoWindow({
         content: `
           <div style="color:#00FF41;font-family:monospace;padding:8px;background:#1a1a1a;border:1px solid #00FF41;">
-            <strong>📍 Destino</strong><br/>
+            <strong>Destino</strong><br/>
             ${selectedLocation.displayName}<br/>
             ${selectedLocation.address ?? ''}
           </div>
@@ -349,7 +349,7 @@ export default function MedellinMap({
       const infoWindow = new window.google.maps.InfoWindow({
         content: `
           <div style="color:#4285F4;font-family:monospace;padding:8px;background:#1a1a1a;border:1px solid #4285F4;">
-            <strong>🚏 Origen</strong><br/>
+            <strong>Origen</strong><br/>
             ${originLocation.displayName}<br/>
             ${originLocation.address ?? ''}
           </div>

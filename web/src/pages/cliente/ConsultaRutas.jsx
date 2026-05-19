@@ -56,7 +56,7 @@ export default function ConsultaRutas() {
             {/* Origin Search */}
             <div>
               <label className="block text-sm font-semibold text-neon-500 mb-2">
-                📍 Parada de Origen
+                Parada de Origen
               </label>
               <DestinationSearch 
                 onDestinationSelect={setOriginLocation}
@@ -73,7 +73,7 @@ export default function ConsultaRutas() {
             {/* Destination Search */}
             <div>
               <label className="block text-sm font-semibold text-neon-500 mb-2">
-                🎯 Parada de Destino
+                Parada de Destino
               </label>
               <DestinationSearch 
                 onDestinationSelect={setDestinationLocation}
