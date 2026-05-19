@@ -1,88 +1,45 @@
-/**
- * MyRuta Web - AuthContext
- * 
- * Responsibilities:
- * - Global authentication state
- * - User information
- * - Login/logout functionality
- * - Role-based access control
- */
+import { createContext, useContext, useEffect, useState } from 'react'
+import { onAuthChange, login, logout } from '../services/authService'
 
-import { createContext, useState, useCallback, useContext, useEffect } from 'react'
-
-export const AuthContext = createContext()
+const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [token, setToken] = useState(localStorage.getItem('authToken'))
-  const [loading, setLoading] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('authToken'))
+  const [loading, setLoading] = useState(true)
 
-  // Initialize from localStorage on mount
   useEffect(() => {
-    const storedToken = localStorage.getItem('authToken')
-    const storedUser = localStorage.getItem('authUser')
-    
-    if (storedToken && storedUser) {
-      setToken(storedToken)
-      setUser(JSON.parse(storedUser))
-      setIsAuthenticated(true)
-    }
-  }, [])
-
-  const login = useCallback((authData) => {
-    // authData = { token, user }
-    setLoading(true)
-    try {
-      const { token: newToken, user: newUser } = authData
-      setToken(newToken)
-      setUser(newUser)
-      setIsAuthenticated(true)
-      
-      // Store in localStorage
-      localStorage.setItem('authToken', newToken)
-      localStorage.setItem('authUser', JSON.stringify(newUser))
-    } catch (error) {
-      console.error('Login failed:', error)
-    } finally {
+    const unsubscribe = onAuthChange((userData) => {
+      setUser(userData)
       setLoading(false)
-    }
+    })
+    return () => unsubscribe()
   }, [])
 
-  const logout = useCallback(() => {
+  const handleLogin = async (email, password) => {
+    const userData = await login(email, password)
+    setUser(userData)
+    return userData
+  }
+
+  const handleLogout = async () => {
+    await logout()
     setUser(null)
-    setToken(null)
-    setIsAuthenticated(false)
-    localStorage.removeItem('authToken')
-    localStorage.removeItem('authUser')
-  }, [])
-
-  const value = {
-    user,
-    token,
-    loading,
-    isAuthenticated,
-    login,
-    logout,
   }
 
   return (
-    <AuthContext.Provider value={value}>
-      {children}
+    <AuthContext.Provider value={{
+      user,
+      loading,
+      login: handleLogin,
+      logout: handleLogout,
+      isAdmin: user?.rol === 'ADMIN',
+      isConductor: user?.rol === 'CONDUCTOR'
+    }}>
+      {!loading && children}
     </AuthContext.Provider>
   )
 }
 
-/**
- * Custom hook to use AuthContext
- * @returns {Object} Auth context value with user, token, isAuthenticated, etc.
- */
 export function useAuth() {
-  const context = useContext(AuthContext)
-  
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider')
-  }
-  
-  return context
+  return useContext(AuthContext)
 }

@@ -25,6 +25,20 @@ from fastapi.responses import JSONResponse
 from app.api import health, predictions, analytics
 from app.config.settings import Settings
 from app.utils.logger import setup_logging, get_logger
+from dotenv import load_dotenv
+
+load_dotenv()
+
+app = FastAPI(title="MyRuta Predictor")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(predictions.router, prefix="/api/predictions")
 
 # Initialize settings from environment
 settings = Settings()

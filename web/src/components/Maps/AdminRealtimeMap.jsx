@@ -14,9 +14,13 @@ import { useState, useEffect } from "react"
 import {
   getRutas,
   subscribeToBuses,
-  getConductor
+  getConductor,
+  subscribeToAlertas,
+  resolverAlerta
 } from "../../services/firestoreService"
 import { getETA, formatETA } from "../../services/etaService"
+import { subscribeToAllLocations } from "../../services/realtimeService"
+import { detectarDesvio, crearAlerta, TIPOS_ALERTA } from "../../services/alertasService"
 
 export default function AdminRealtimeMap() {
   const [isLoading, setIsLoading] = useState(true)
@@ -24,6 +28,57 @@ export default function AdminRealtimeMap() {
   const [selectedRutaId, setSelectedRutaId] = useState(null)
   const [buses, setBuses] = useState([])
   const [etas, setEtas] = useState({})
+  const [locations, setLocations] = useState({})
+  const [alertas, setAlertas] = useState([])
+  const [conductores, setConductores] = useState({})
+
+  // Cargar conductores de los buses
+  useEffect(() => {
+    const loadConductores = async () => {
+      const map = {}
+      for (const bus of buses) {
+        if (bus.conductorId && !map[bus.conductorId]) {
+          const conductor = await getConductor(bus.conductorId)
+          if (conductor) map[bus.conductorId] = conductor
+        }
+      }
+      setConductores(map)
+    }
+    if (buses.length > 0) loadConductores()
+  }, [buses])
+
+  // Suscribirse a ubicaciones en tiempo real
+  useEffect(() => {
+    const unsub = subscribeToAllLocations((locs) => {
+      const locMap = {}
+      locs.forEach(l => { locMap[l.conductorId] = l })
+      setLocations(locMap)
+
+      // Detectar desvíos
+      locs.forEach(async (loc) => {
+        const ruta = rutas.find(r => r.id === loc.rutaId)
+        if (!ruta?.waypoints) return
+        const hayDesvio = detectarDesvio(loc, ruta.waypoints)
+        if (hayDesvio) {
+          await crearAlerta({
+            conductorId: loc.conductorId,
+            busPlaca: loc.busId,
+            tipo: TIPOS_ALERTA.DESVIO,
+            mensaje: 'El bus se ha desviado de la ruta asignada',
+            lat: loc.lat,
+            lng: loc.lng
+          })
+        }
+      })
+    })
+    return () => unsub()
+  }, [rutas])
+
+  // Suscribirse a alertas activas
+  useEffect(() => {
+    const unsub = subscribeToAlertas((data) => setAlertas(data))
+    return () => unsub()
+  }, [])
 
   // Load routes
   useEffect(() => {
@@ -116,7 +171,7 @@ export default function AdminRealtimeMap() {
             <option value="">Todas las Rutas</option>
             {rutas.map((ruta) => (
               <option key={ruta.id} value={ruta.id}>
-                {ruta.code} - {ruta.name}
+                {ruta.codigo} - {ruta.nombre}
               </option>
             ))}
           </select>
@@ -154,7 +209,7 @@ export default function AdminRealtimeMap() {
               </thead>
               <tbody>
                 {filteredBuses.map((bus, idx) => {
-                  const conductor = getConductor(bus.conductorId)
+                  const conductor = conductores[bus.conductorId]
                   const ruta = rutas.find((r) => r.id === bus.rutaAsignada)
 
                   return (
@@ -171,7 +226,7 @@ export default function AdminRealtimeMap() {
                           : "N/A"}
                       </td>
                       <td className="py-4 px-6 text-neon-500">
-                        {ruta?.name || "N/A"}
+                        {ruta?.nombre || "N/A"}
                       </td>
                       <td className="py-4 px-6 text-neon-500 opacity-75">
                         {conductor?.numeroDeViajes || "0"}
@@ -190,6 +245,34 @@ export default function AdminRealtimeMap() {
                 })}
               </tbody>
             </table>
+          </div>
+        )}
+        {/* Alertas activas */}
+        {alertas.length > 0 && (
+          <div className="bg-dark-800 border-2 border-red-500 rounded-xl p-4"
+            style={{ boxShadow: "0 0 20px rgba(255, 0, 0, 0.2)" }}>
+            <h3 className="text-red-400 font-bold mb-3">
+              ⚠️ Alertas Activas ({alertas.length})
+            </h3>
+            <div className="space-y-2">
+              {alertas.map((alerta) => (
+                <div key={alerta.id}
+                  className="flex items-center justify-between bg-dark-700 border border-red-500 rounded-lg p-3">
+                  <div>
+                    <span className="text-red-400 font-semibold">{alerta.tipo}</span>
+                    <span className="text-neon-500 ml-3 text-sm">{alerta.mensaje}</span>
+                    <span className="text-neon-500 opacity-50 ml-3 text-xs">
+                      Bus: {alerta.busPlaca}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => resolverAlerta(alerta.id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600 transition">
+                    Resolver
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

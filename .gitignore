@@ -6,6 +6,12 @@
 *.env.local
 web/.env.example
 .venv
+predictor/.env.example
+predictor/.env
+
+# Firebase
+backend/firebase-service-account.json
+predictor/firebase-service-account.json
 
 # Node modules
 node_modules/
