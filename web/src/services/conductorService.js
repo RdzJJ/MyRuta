@@ -3,36 +3,44 @@ import { db } from '../config/firebase'
 import { registerUser } from './authService'
 import { getConductores, getConductor } from './firestoreService'
 import { subscribeToConductorLocation } from './realtimeService'
+import { initializeApp, getApp, deleteApp } from 'firebase/app'
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
 
-/**
- * Crear nuevo conductor
- * - Crea usuario en Firebase Auth
- * - Crea documento en colección 'conductors' de Firestore
- * - Asigna rol 'CONDUCTOR'
- */
 export async function crearConductor(conductorData) {
-  const { email, password, nombre, telefono, placa, rutaId } = conductorData
+  const { email, password, nombre, telefono, busId, rutaId } = conductorData
+
+  // App secundaria para no cerrar sesión del admin
+  const secondaryApp = initializeApp(getApp().options, `conductor-creation-${Date.now()}`)
+  const secondaryAuth = getAuth(secondaryApp)
 
   try {
-    // Crear usuario en Firebase Auth y documento en Firestore
-    const userCredential = await registerUser(email, password, {
-      nombre,
-      apellido: '',
-      rol: 'CONDUCTOR'
-    })
+    // Crear usuario en la app secundaria (no afecta la sesión del admin)
+    const userCredential = await createUserWithEmailAndPassword(
+      secondaryAuth,
+      email,
+      password
+    )
+    const conductorId = userCredential.user.uid
 
-    const conductorId = userCredential.uid
-
-    // Crear documento en colección 'conductors' con el uid como ID
+    // Crear documento en Firestore (el admin sigue autenticado aquí)
     await setDoc(doc(db, 'conductors', conductorId), {
       nombre,
       email,
       telefono,
-      placa,
+      busId,
       rutaId,
+      rol: 'CONDUCTOR',
       activo: true,
       creadoEn: serverTimestamp(),
       numeroDeViajes: 0
+    })
+
+    // También crear en 'users' para que onAuthChange lo reconozca
+    await setDoc(doc(db, 'users', conductorId), {
+      nombre,
+      email,
+      rol: 'CONDUCTOR',
+      createdAt: serverTimestamp()
     })
 
     return { id: conductorId, email, nombre }
@@ -41,8 +49,11 @@ export async function crearConductor(conductorData) {
     throw new Error(
       error.code === 'auth/email-already-in-use'
         ? 'El email ya está registrado'
-        : 'Error al crear el conductor'
+        : `Error al crear el conductor: ${error.message}`
     )
+  } finally {
+    // Siempre limpiar la app secundaria
+    await deleteApp(secondaryApp)
   }
 }
 
@@ -160,8 +171,8 @@ export function validarDatosConductor(datos) {
     errores.push('Teléfono inválido')
   }
 
-  if (!datos.placa || datos.placa.trim().length < 3) {
-    errores.push('La placa del bus es requerida')
+  if (!datos.busId) {
+    errores.push('Debe asignar un bus')
   }
 
   if (!datos.rutaId) {
