@@ -27,3 +27,7 @@ prisma/migrations/
 # Logs
 logs/
 *.log
+
+# BD
+.env
+firebase-service-account.json
