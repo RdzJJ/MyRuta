@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'config/theme.dart';
 import 'config/constants.dart';
-import 'screens/cliente/pantalla_explorar_rutas.dart';
+import 'screens/seleccion_rol.dart';
+
 import 'screens/cliente/pantalla_inicio.dart';
+import 'screens/cliente/pantalla_explorar_rutas.dart';
+import 'screens/cliente/pantalla_viaje_activo.dart';
 import 'screens/cliente/pantalla_llegada_en_vivo.dart';
 import 'screens/cliente/pantalla_perfil.dart';
-import 'screens/cliente/pantalla_viaje_activo.dart';
-import 'screens/seleccion_rol.dart';
-import 'screens/cliente/pantalla_navegacion.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

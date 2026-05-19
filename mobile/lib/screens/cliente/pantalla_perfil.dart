@@ -180,7 +180,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
               const SizedBox(height: 16),
               // Dropdown Género
               DropdownButtonFormField<String>(
-                initialValue: _genero,
+                value:_genero,
                 style: const TextStyle(color: AppColors.textPrimary),
                 dropdownColor: AppColors.surface,
                 items: ['Masculino', 'Femenino', 'Otro', 'No especificado']

@@ -1,7 +1,9 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
-import 'pantalla_inicio_conductor.dart';
+
+import 'package:flutter/gestures.dart';
+
+import 'pantalla_login_conductor.dart';
 
 class PantallaLoginConductor extends StatefulWidget {
   const PantallaLoginConductor({Key? key}) : super(key: key);
@@ -307,7 +309,7 @@ class _PantallaLoginConductorState extends State<PantallaLoginConductor> {
       // Aquí iría la validación real con el backend
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) => const PantallaInicioConductor(),
+          builder: (_) => const PantallaLoginConductor(),
         ),
       );
     });
