@@ -200,14 +200,14 @@ export default function GestionBuses() {
           <div>
             <h1 className="text-5xl font-bold text-neon-500 mb-2"
               style={{ textShadow: '0 0 20px rgba(0, 255, 65, 0.8)' }}>
-              🚌 Gestión de Buses
+              Gestión de Buses
             </h1>
             <div className="h-1 w-24 bg-gradient-to-r from-neon-500 to-transparent" />
           </div>
           <button onClick={handleNuevoBus}
             className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-3 px-6 rounded-lg hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
             style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.5)' }}>
-            ➕ Nuevo Bus
+            Nuevo Bus
           </button>
         </div>
 
@@ -300,8 +300,7 @@ export default function GestionBuses() {
                         </td>
                         <td className="py-4 px-6">
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${estado.color}`}
-                            style={{ boxShadow: estado.shadow }}>
-                            {estado.icon} {estado.label}
+                            style={{ boxShadow: estado.shadow }}> {estado.label}
                           </span>
                         </td>
                         <td className="py-4 px-6">
@@ -334,7 +333,7 @@ export default function GestionBuses() {
 
             <h2 className="text-2xl font-bold text-neon-500 mb-6"
               style={{ textShadow: '0 0 10px rgba(0,255,65,0.6)' }}>
-              {editando ? '✏️ Editar Bus' : '➕ Nuevo Bus'}
+              {editando ? 'Editar Bus' : 'Nuevo Bus'}
             </h2>
 
             {errores.length > 0 && (
