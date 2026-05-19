@@ -5,6 +5,7 @@ import HistorialRecorridos from '../../components/admin/HistorialRecorridos'
 import { getBuses, getRutas } from '../../services/firestoreService'
 
 export default function Dashboard() {
+  const [buses, setBuses] = useState([])
   const navigate = useNavigate()
   const [stats, setStats] = useState({
     rutasActivas: 0,
@@ -17,10 +18,10 @@ export default function Dashboard() {
   useEffect(() => {
     const loadStats = async () => {
       const [buses, rutas] = await Promise.all([getBuses(), getRutas()])
-      
       const rutasActivas = rutas.filter((r) => r.status === 'active').length
       const conductoresSet = new Set(buses.map((b) => b.conductorId))
-      
+      setBuses(buses)
+
       setStats({
         rutasActivas,
         conductores: conductoresSet.size,
@@ -36,6 +37,7 @@ export default function Dashboard() {
     { label: 'Rutas Activas', value: stats.rutasActivas, icon: '🛣️' },
     { label: 'Conductores', value: stats.conductores, icon: '👨‍✈️' },
     { label: 'Viajes Hoy', value: stats.viajesHoy, icon: '🚌' },
+    { label: 'Buses Activos', value: buses.length, icon: '🚌' },
     { label: 'Incidencias', value: stats.incidencias, icon: '⚠️' },
   ]
 
@@ -78,7 +80,15 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <button
+            onClick={() => navigate('/admin/buses')}
+            className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-4 px-6 rounded-xl hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
+            style={{ boxShadow: '0 0 20px rgba(0, 255, 65, 0.4)' }}
+          >
+            Gestionar Buses
+          </button>
           <button
             onClick={() => navigate('/admin/rutas')}
             className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-4 px-6 rounded-xl hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"

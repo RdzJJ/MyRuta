@@ -13,6 +13,7 @@ import AdminLiveMap from './pages/admin/LiveMap'
 import AdminReportes from './pages/admin/Reportes'
 import AdminRutas from './pages/admin/GestionRutas'
 import AdminConductores from './pages/admin/GestionConductores'
+import GestionBuses from './pages/admin/GestionBuses'
 
 // Cliente Pages (Public Access)
 import ClienteHome from './pages/cliente/Home'
@@ -79,6 +80,13 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/admin/buses"
+                  element={
+                    <ProtectedRoute adminOnly>
+                      <GestionBuses />
+                    </ProtectedRoute>
+                  } />
 
                 <Route
                   path="/admin/rutas"
