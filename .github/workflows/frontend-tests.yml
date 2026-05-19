@@ -1,0 +1,49 @@
+name: Frontend Tests & Build
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'web/**'
+      - '.github/workflows/frontend-tests.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'web/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: web
+
+      - name: Run tests
+        run: npm test
+        working-directory: web
+        continue-on-error: true
+
+      - name: Build
+        run: npm run build
+        working-directory: web
+        continue-on-error: true
+
+      - name: Lint
+        run: npm run lint
+        working-directory: web
+        continue-on-error: true

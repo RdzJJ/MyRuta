@@ -1,201 +1,140 @@
-"""
-MyRuta Predictor - Predictions Routes
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from typing import List, Optional
+import math
+from app.config.firebase_config import init_firebase, get_realtime_db, get_firestore
+from app.config.firebase_service import publicar_prediccion_rtdb
 
-API endpoints for delay predictions on transit routes.
-
-Responsibilities:
-- Handle single route delay predictions
-- Handle batch delay predictions
-- Interface with prediction service
-- Validate input data
-- Return prediction results with confidence scores
-"""
-
-from datetime import datetime, timedelta
-from typing import List
-
-from fastapi import APIRouter, HTTPException, Request, status
-
-from app.models.schemas import (
-    PredictionRequest,
-    PredictionResponse,
-    BatchPredictionRequest,
-    BatchPredictionResponse,
-)
-from app.services.prediction_service import PredictionService
-from app.utils.logger import get_logger
-
+init_firebase()
 router = APIRouter()
-logger = get_logger(__name__)
 
-# TODO: Initialize prediction service with loaded model
-prediction_service = PredictionService()
+# ── Modelos ────────────────────────────────────────────────
 
+class Waypoint(BaseModel):
+    lat: float
+    lng: float
 
-@router.post("/predict", response_model=PredictionResponse)
-async def predict_delay(request: PredictionRequest):
-    """
-    Predict delay for a single route.
-    
-    Args:
-        request: PredictionRequest with route and location data
-        
-    Returns:
-        PredictionResponse: Predicted delay and confidence
-        
-    Raises:
-        HTTPException: If prediction fails
-    """
+class ETARequest(BaseModel):
+    bus_id: str
+    placa: str
+    current_location: Waypoint
+    route_id: str
+    waypoints: List[Waypoint]
+    current_speed: Optional[float] = 40.0
+
+class ETAResponse(BaseModel):
+    eta_minutes: float
+    estimated_arrival_time: str
+    confidence: float
+    source: str
+    distance_km: float
+
+# ── Helpers ────────────────────────────────────────────────
+
+def haversine_distance(p1: Waypoint, p2: Waypoint) -> float:
+    """Distancia en km entre dos coordenadas"""
+    R = 6371
+    lat1, lng1 = math.radians(p1.lat), math.radians(p1.lng)
+    lat2, lng2 = math.radians(p2.lat), math.radians(p2.lng)
+    dlat = lat2 - lat1
+    dlng = lng2 - lng1
+    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlng/2)**2
+    return R * 2 * math.asin(math.sqrt(a))
+
+def calculate_route_distance(current: Waypoint, waypoints: List[Waypoint]) -> float:
+    """Distancia total desde la ubicación actual hasta el final de la ruta"""
+    # Encontrar el waypoint más cercano
+    distances = [haversine_distance(current, wp) for wp in waypoints]
+    nearest_idx = distances.index(min(distances))
+
+    # Sumar distancia desde el punto más cercano hasta el final
+    total = distances[nearest_idx]
+    for i in range(nearest_idx, len(waypoints) - 1):
+        total += haversine_distance(waypoints[i], waypoints[i + 1])
+
+    return total
+
+def get_historical_avg(route_id: str) -> Optional[float]:
+    """Obtener promedio histórico desde Firestore"""
     try:
-        logger.info(f"Predicting delay for route: {request.route_id}")
+        fs = get_firestore()
+        doc = fs.collection("rutas").document(route_id).get()
+        if doc.exists:
+            data = doc.to_dict()
+            return data.get("avg_time_minutes")
+    except Exception:
+        pass
+    return None
 
-        # Get prediction from service
-        prediction = await prediction_service.predict_delay(request)
-
-        if prediction is None:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to generate prediction",
-            )
-
-        logger.info(
-            f"Prediction for route {request.route_id}: "
-            f"{prediction.predicted_delay_minutes} minutes delay "
-            f"(confidence: {prediction.confidence})"
-        )
-
-        return prediction
-
-    except ValueError as e:
-        logger.warning(f"Validation error in prediction: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
-        )
-    except Exception as e:
-        logger.error(f"Error in prediction: {str(e)}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal server error during prediction",
-        )
-
-
-@router.post("/batch", response_model=BatchPredictionResponse)
-async def batch_predict_delays(request: BatchPredictionRequest):
-    """
-    Predict delays for multiple routes in batch.
-    
-    Args:
-        request: BatchPredictionRequest with list of prediction requests
-        
-    Returns:
-        BatchPredictionResponse: List of predictions for all routes
-        
-    Raises:
-        HTTPException: If batch processing fails
-    """
+def get_live_speed(bus_id: str) -> Optional[float]:
+    """Obtener velocidad en vivo desde Realtime Database"""
     try:
-        logger.info(f"Processing batch prediction for {len(request.predictions)} routes")
+        rtdb = get_realtime_db()
+        # Buscar en conductors_location por busId
+        locs = rtdb.child("conductors_location").get()
+        if locs:
+            for conductor_id, data in locs.items():
+                if data.get("busId") == bus_id:
+                    return data.get("velocidad")
+    except Exception:
+        pass
+    return None
 
-        predictions: List[PredictionResponse] = []
+# ── Endpoint principal ─────────────────────────────────────
 
-        for pred_request in request.predictions:
-            try:
-                prediction = await prediction_service.predict_delay(pred_request)
-                if prediction:
-                    predictions.append(prediction)
-                else:
-                    logger.warning(
-                        f"Failed to predict for route {pred_request.route_id}"
-                    )
-            except Exception as e:
-                logger.warning(
-                    f"Error predicting route {pred_request.route_id}: {str(e)}"
-                )
-                # Continue with next prediction on error
+@router.post("/eta", response_model=ETAResponse)
+async def predict_eta(request: ETARequest):
+    from datetime import datetime, timedelta
 
-        logger.info(f"Batch prediction completed: {len(predictions)} predictions")
+    if not request.waypoints:
+        raise HTTPException(status_code=400, detail="Se requieren waypoints")
 
-        return BatchPredictionResponse(
-            predictions=predictions,
-            total_count=len(predictions),
-            processed_at=datetime.utcnow(),
-        )
+    # 1. Distancia total restante
+    distance_km = calculate_route_distance(
+        request.current_location,
+        request.waypoints
+    )
 
-    except Exception as e:
-        logger.error(f"Error in batch predictions: {str(e)}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal server error during batch prediction",
-        )
+    # 2. Velocidad: en vivo > request > default
+    speed = get_live_speed(request.bus_id) or request.current_speed or 40.0
 
+    # Factor de tráfico simple (horas pico)
+    hora = datetime.now().hour
+    traffic_factor = 1.4 if hora in range(7, 9) or hora in range(17, 20) else 1.0
 
-@router.get("/explanation/{route_id}")
-async def get_prediction_explanation(route_id: str):
-    """
-    Get explanation for the last prediction of a route.
-    
-    Uses SHAP or LIME to explain model decisions.
-    
-    Args:
-        route_id: Route identifier
-        
-    Returns:
-        dict: Explanation features and their importances
-    """
-    try:
-        logger.info(f"Getting explanation for route: {route_id}")
+    # 3. ETA base
+    eta_hours = (distance_km / speed) * traffic_factor
+    eta_minutes = round(eta_hours * 60, 1)
 
-        # TODO: Implement prediction explanation using SHAP/LIME
-        explanation = await prediction_service.get_prediction_explanation(route_id)
+    # 4. Ajuste con histórico si existe
+    historical = get_historical_avg(request.route_id)
+    confidence = 0.75
 
-        return {
-            "route_id": route_id,
-            "explanation": explanation,
-            "timestamp": datetime.utcnow(),
-        }
+    if historical:
+        # Promedio ponderado: 70% modelo, 30% histórico
+        eta_minutes = round(eta_minutes * 0.7 + historical * 0.3, 1)
+        confidence = 0.88
 
-    except Exception as e:
-        logger.error(f"Error getting explanation: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to generate explanation",
-        )
+    # 5. Tiempo estimado de llegada
+    arrival = datetime.now() + timedelta(minutes=eta_minutes)
 
+    # Publicar resultado en Realtime DB
+    publicar_prediccion_rtdb(request.bus_id, {
+        "eta_minutes": eta_minutes,
+        "route_id": request.route_id,
+        "distance_km": round(distance_km, 2),
+        "confidence": confidence,
+        "estimated_arrival_time": arrival.isoformat()
+    })
 
-@router.post("/validate-historical")
-async def validate_with_historical_data(route_id: str, hours: int = 24):
-    """
-    Validate predictions against historical data.
-    
-    Compares predicted values with actual values from past trips.
-    Useful for model monitoring and quality checks.
-    
-    Args:
-        route_id: Route identifier
-        hours: Number of hours of historical data to analyze
-        
-    Returns:
-        dict: Validation metrics and accuracy measures
-    """
-    try:
-        logger.info(f"Validating predictions for route {route_id} (last {hours}h)")
+    return ETAResponse(
+        eta_minutes=eta_minutes,
+        estimated_arrival_time=arrival.isoformat(),
+        confidence=confidence,
+        source="PREDICTOR_ML",
+        distance_km=round(distance_km, 2)
+    )
 
-        # TODO: Implement historical validation
-        validation_result = await prediction_service.validate_with_history(
-            route_id, hours
-        )
-
-        return {
-            "route_id": route_id,
-            "period_hours": hours,
-            "validation": validation_result,
-            "timestamp": datetime.utcnow(),
-        }
-
-    except Exception as e:
-        logger.error(f"Error validating predictions: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to validate predictions",
-        )
+@router.get("/health")
+async def health():
+    return {"status": "ok", "service": "predictor"}
