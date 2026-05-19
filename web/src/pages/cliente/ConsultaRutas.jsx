@@ -1,26 +1,28 @@
-/**
- * MyRuta Web - Cliente Routes Search Page
- * 
- * Features:
- * - Smart destination search with Google Maps autocomplete
- * - Real-time route filtering
- * - Interactive map centered on Medellín
- */
-
 import { useState } from 'react'
 import DestinationSearch from '../../components/DestinationSearch'
 import MedellinMap from '../../components/Maps/MedellinMap'
-
-const mockRoutes = [
-  { code: 'A001', origin: 'Centro', destination: 'Periférico', duration: '45 min', stops: 12, nextBus: '5 min' },
-  { code: 'A002', origin: 'Centro', destination: 'Hospital', duration: '30 min', stops: 8, nextBus: '12 min' },
-  { code: 'A003', origin: 'Centro', destination: 'Aeropuerto', duration: '60 min', stops: 15, nextBus: '18 min' },
-]
+import { useEffect } from 'react'
+import { getRutas } from '../../services/firestoreService'
 
 export default function ConsultaRutas() {
   const [originLocation, setOriginLocation] = useState(null)
   const [destinationLocation, setDestinationLocation] = useState(null)
-  const [results, setResults] = useState(mockRoutes)
+  const [results, setResults] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const cargar = async () => {
+      try {
+        const rutas = await getRutas()
+        setResults(rutas)
+      } catch (error) {
+        console.error('Error cargando rutas:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    cargar()
+  }, [])
 
   const handleSearch = () => {
     console.log('Buscando rutas:', {
@@ -43,7 +45,7 @@ export default function ConsultaRutas() {
 
         {/* Map Display */}
         <div className="mb-8">
-          <MedellinMap 
+          <MedellinMap
             selectedLocation={destinationLocation}
             originLocation={originLocation}
             className="rounded-xl"
@@ -58,7 +60,7 @@ export default function ConsultaRutas() {
               <label className="block text-sm font-semibold text-neon-500 mb-2">
                 Parada de Origen
               </label>
-              <DestinationSearch 
+              <DestinationSearch
                 onDestinationSelect={setOriginLocation}
                 placeholder="Ej: Centro, Mercado..."
                 showMyLocation={true}
@@ -75,7 +77,7 @@ export default function ConsultaRutas() {
               <label className="block text-sm font-semibold text-neon-500 mb-2">
                 Parada de Destino
               </label>
-              <DestinationSearch 
+              <DestinationSearch
                 onDestinationSelect={setDestinationLocation}
                 placeholder="Ej: Periférico, Hospital..."
                 showMyLocation={false}
@@ -103,51 +105,65 @@ export default function ConsultaRutas() {
 
         {/* Results */}
         <div>
-          <h2 className="text-2xl font-bold text-neon-500 mb-4" style={{ textShadow: '0 0 10px rgba(0, 255, 65, 0.6)' }}>
+          <h2 className="text-2xl font-bold text-neon-500 mb-4"
+            style={{ textShadow: '0 0 10px rgba(0, 255, 65, 0.6)' }}>
             ✓ Rutas Disponibles ({results.length})
           </h2>
 
-          <div className="space-y-4">
-            {results.map((route) => (
-              <div
-                key={route.code}
-                className="bg-dark-800 border-2 border-neon-500 rounded-xl p-6 hover:shadow-lg transition"
-                style={{ boxShadow: '0 0 15px rgba(0, 255, 65, 0.2)' }}
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-2xl font-bold text-neon-500">{route.code}</h3>
-                    <p className="text-neon-500 opacity-75 text-lg mt-1">
-                      {route.origin} → {route.destination}
-                    </p>
+          {isLoading ? (
+            <p className="text-neon-500 opacity-60">Cargando rutas...</p>
+          ) : results.length === 0 ? (
+            <p className="text-neon-500 opacity-60">No hay rutas disponibles</p>
+          ) : (
+            <div className="space-y-4">
+              {results.map((ruta) => (
+                <div key={ruta.id}
+                  className="bg-dark-800 border-2 border-neon-500 rounded-xl p-6 hover:shadow-lg transition"
+                  style={{ boxShadow: '0 0 15px rgba(0, 255, 65, 0.2)' }}>
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-2xl font-bold text-neon-500">{ruta.codigo}</h3>
+                      <p className="text-neon-500 opacity-75 text-lg mt-1">{ruta.nombre}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${ruta.status === 'active'
+                        ? 'bg-neon-500 bg-opacity-20 text-neon-500'
+                        : 'bg-red-500 bg-opacity-20 text-red-400'
+                        }`}>
+                        {ruta.status === 'active' ? '🟢 Activa' : '🔴 Inactiva'}
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-green-400 font-bold text-xl">🟢 {route.nextBus}</p>
-                    <p className="text-neon-500 opacity-75 text-sm">Próximo bus</p>
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-3 gap-4 mb-4 pt-4 border-t border-neon-500 border-opacity-30">
-                  <div>
-                    <p className="text-neon-500 opacity-75 text-sm">Duración</p>
-                    <p className="text-neon-500 font-bold">⏱️ {route.duration}</p>
-                  </div>
-                  <div>
-                    <p className="text-neon-500 opacity-75 text-sm">Paradas</p>
-                    <p className="text-neon-500 font-bold">🛑 {route.stops} paradas</p>
-                  </div>
-                  <div className="text-right">
-                    <button
-                      className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-2 px-6 rounded-lg hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
-                      style={{ boxShadow: '0 0 10px rgba(0, 255, 65, 0.3)' }}
-                    >
-                      ✓ Seleccionar
-                    </button>
+                  <div className="grid grid-cols-3 gap-4 pt-4 border-t border-neon-500 border-opacity-30">
+                    <div>
+                      <p className="text-neon-500 opacity-75 text-sm">Paradas</p>
+                      <p className="text-neon-500 font-bold">
+                        🛑 {ruta.paradas || ruta.waypoints?.length || '—'} paradas
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-neon-500 opacity-75 text-sm">Color de ruta</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="w-4 h-4 rounded-full"
+                          style={{ backgroundColor: ruta.color || '#00FF41' }} />
+                        <span className="text-neon-500 text-sm font-mono">
+                          {ruta.color || '#00FF41'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <button
+                        className="bg-gradient-to-r from-neon-500 to-neon-600 text-dark-900 font-bold py-2 px-6 rounded-lg hover:from-neon-400 hover:to-neon-500 transition transform hover:scale-105"
+                        style={{ boxShadow: '0 0 10px rgba(0, 255, 65, 0.3)' }}>
+                        ✓ Seleccionar
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Info Banner */}
@@ -156,7 +172,7 @@ export default function ConsultaRutas() {
             💡 <strong>Tip:</strong> Selecciona una ruta para ver horarios en tiempo real y rastreo del bus.
           </p>
         </div>
-      </main>
-    </div>
+      </main >
+    </div >
   )
 }
