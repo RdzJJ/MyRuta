@@ -10,18 +10,6 @@ Plataforma completa que permite rastrear conductores mediante GPS, predecir demo
 
 ---
 
-## 📋 Tabla de Contenidos
-
-- [Características](#características)
-- [Tecnologías](#tecnologías)
-- [Servicios](#servicios)
-- [Roles y Permisos](#roles-y-permisos)
-- [Inicio Rápido](#inicio-rápido)
-- [Estructura](#estructura)
-- [APIs Principales](#apis-principales)
-
----
-
 ## ✨ Características
 
 ### 🗺️ Monitoreo en Tiempo Real
